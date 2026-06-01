@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stayce — Billing Process</title>
+<title>Billing Process</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -145,22 +145,443 @@
 .name-input::placeholder { color: #5f5e5a; }
 body { padding-bottom: 64px; }
 </style>
+
+<style>
+.area-nav { display:flex; gap:8px; margin-bottom:28px; border-bottom:1px solid var(--border); overflow-x:auto; }
+.area-btn { padding:12px 22px; font-size:14px; font-family:Georgia,serif; color:var(--text2); background:none; border:none; border-bottom:3px solid transparent; cursor:pointer; white-space:nowrap; }
+.area-btn.active { color:var(--text); border-bottom-color:var(--text); }
+.area-btn:hover:not(.active){ color:var(--text); }
+.area-panel { display:none; }
+.area-panel.active { display:block; }
+.area-intro { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+.area-card { background:#fafaf8; border:1px solid #d3d1c7; border-radius:8px; padding:14px 16px; }
+.area-card h3 { font-size:14px; font-weight:500; margin-bottom:6px; }
+.area-card p { font-size:13px; color:#5f5e5a; line-height:1.5; }
+.section-title { margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid #eceae3; }
+.section-title h2 { font-size:22px; font-weight:500; letter-spacing:-0.3px; margin-bottom:4px; font-family:Georgia,serif; }
+.section-title p { font-size:14px; color:#5f5e5a; font-style:italic; font-family:Georgia,serif; }
+.decision-grid { display:grid; grid-template-columns:1fr; gap:8px; margin-top:18px; }
+.decision-title { font-size:18px; font-weight:500; margin:28px 0 12px; font-family:Georgia,serif;}
+@media (max-width:800px){ .area-intro{grid-template-columns:1fr;} body{padding:20px;} }
+</style>
 </head>
 <body>
-
+<style>
+.dec-group-title {
+  font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em;
+  color: #8a8880; font-family: Georgia, serif; margin: 24px 0 10px;
+}
+.dec-group-title:first-child { margin-top: 0; }
+.dec-card {
+  display: flex; gap: 0; border-radius: 8px; overflow: hidden;
+  border: 1px solid #d3d1c7; margin-bottom: 8px;
+}
+.dec-severity {
+  width: 6px; min-width: 6px; flex-shrink: 0;
+}
+.dec-body { padding: 14px 16px; flex: 1; background: #fafaf8; }
+.dec-title { font-size: 14px; font-weight: 500; font-family: Georgia, serif; color: #1a1a18; margin: 0 0 6px; }
+.dec-context { font-size: 13px; font-family: Georgia, serif; color: #5f5e5a; margin: 0; line-height: 1.6; }
+.dec-context strong { color: #2c2c2a; font-weight: 500; }
+</style>
 <header>
-  <h1>Stayce Holcomb — Billing Process</h1>
-  <p>Finance · Maxio · Intranet · 10yr tenure — step-by-step operational flows</p>
+  <h1>ROSnet Operating Model</h1>
+  <p>Sales · Finance · CRM</p>
 </header>
 
-<div class="tab-nav">
-  <button class="tab-btn active" onclick="showTab('new-client',this)">New client</button>
-  <button class="tab-btn" onclick="showTab('first-billing',this)">First billing</button>
-  <button class="tab-btn" onclick="showTab('loc-open',this)">Location opens</button>
-  <button class="tab-btn" onclick="showTab('loc-close',this)">Location closes</button>
-  <button class="tab-btn" onclick="showTab('monthly',this)">Monthly cycle</button>
+<div class="area-nav">
+  <button class="area-btn active" onclick="showArea('sales', this)">Sales</button>
+  <button class="area-btn" onclick="showArea('finance', this)">Finance</button>
+  <button class="area-btn" onclick="showArea('crm', this)">CRM</button>
 </div>
 
+<section id="area-sales" class="area-panel active">
+  <div class="section-title"><h2>Sales overview</h2><p>Pipeline, rep workflow, deal rules, tools, gaps, and decisions to define.</p></div>
+  <div class="area-intro">
+    <div class="area-card"><h3>Purpose</h3><p>Manage qualified commercial opportunities without inflating pipeline or creating duplicate companies.</p></div>
+    <div class="area-card"><h3>Core rule</h3><p>Deal = concept being sold. Company = legal operator. New location of existing concept is not a Sales deal.</p></div>
+    <div class="area-card"><h3>Main risks</h3><p>MRR vs ARR confusion, inconsistent naming, deleted ghosted stage, and missing prioritization views.</p></div>
+  </div>
+<!-- ═══════════════════════════════════════════════════════════════
+     SALES PROCESS SECTION
+════════════════════════════════════════════════════════════════ -->
+
+
+<div style="margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #eceae3;">
+  <h2 style="font-size: 22px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 4px; font-family: Georgia, serif;">Sales process — how it works today</h2>
+  <p style="font-size: 14px; color: #5f5e5a; font-style: italic; font-family: Georgia, serif;">Consolidated from discovery sessions with the sales team · May 2026</p>
+</div>
+
+<!-- Sales tabs -->
+<div class="tab-nav" id="sales-nav">
+  <button class="tab-btn s-active" onclick="showSales('pipeline',this)">Pipeline stages</button>
+  <button class="tab-btn" onclick="showSales('daily',this)">Daily workflow</button>
+  <button class="tab-btn" onclick="showSales('tools',this)">Tools & systems</button>
+  <button class="tab-btn" onclick="showSales('gaps',this)">Gaps today</button>
+</div>
+
+<style>
+.tab-btn.s-active { color: #1a1a18; border-bottom-color: #1a1a18; }
+</style>
+
+<!-- ── PIPELINE STAGES ── -->
+<div id="sales-pipeline" class="sales-panel" style="display:block;">
+<svg viewBox="0 0 680 560" style="display:block;width:100%;height:auto;">
+<defs>
+  <marker id="sarr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- Contacts (pre-pipeline) -->
+<rect x="20" y="20" width="140" height="64" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="90" y="40" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Contacts only</text>
+<text x="90" y="56" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Met at conference</text>
+<text x="90" y="70" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">No email reply yet</text>
+
+<!-- Arrow to pipeline -->
+<line x1="160" y1="52" x2="186" y2="52" stroke="#5f5e5a" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#sarr)"/>
+<text x="172" y="44" text-anchor="middle" font-size="9" fill="#8a8880" font-family="Georgia,serif">buying signal</text>
+
+<!-- Stage 1: Discovery -->
+<rect x="188" y="20" width="140" height="64" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
+<text x="258" y="38" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Discovery</text>
+<text x="258" y="52" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">First demo booked</text>
+<text x="258" y="64" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Understand the group</text>
+<text x="258" y="76" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Confirm fit</text>
+<line x1="328" y1="52" x2="354" y2="52" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
+
+<!-- Stage 2: Solution Fit -->
+<rect x="356" y="20" width="140" height="64" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
+<text x="426" y="38" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Solution Fit</text>
+<text x="426" y="52" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Follow-up demos</text>
+<text x="426" y="64" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Deeper dive into modules</text>
+<text x="426" y="76" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Custom tailor the pitch</text>
+<line x1="496" y1="52" x2="522" y2="52" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
+
+<!-- Stage 3: Proposal -->
+<rect x="524" y="20" width="140" height="64" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
+<text x="594" y="38" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Proposal</text>
+<text x="594" y="52" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Pricing sent by email</text>
+<text x="594" y="64" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Prospect reviews</text>
+<text x="594" y="76" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Discussion / negotiation</text>
+
+<!-- Second row -->
+<line x1="594" y1="84" x2="594" y2="110" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="594" y1="110" x2="426" y2="110" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
+
+<!-- Stage 4: Agreements -->
+<rect x="356" y="120" width="140" height="64" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="1"/>
+<text x="426" y="138" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Agreements</text>
+<text x="426" y="152" text-anchor="middle" font-size="10" fill="#854f0b" font-family="Georgia,serif">PandaDoc sent</text>
+<text x="426" y="164" text-anchor="middle" font-size="10" fill="#854f0b" font-family="Georgia,serif">Terms agreed · waiting for</text>
+<text x="426" y="176" text-anchor="middle" font-size="10" fill="#854f0b" font-family="Georgia,serif">signature</text>
+<line x1="356" y1="152" x2="330" y2="152" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
+
+<!-- Stage 5: Closed Won -->
+<rect x="188" y="120" width="140" height="64" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/>
+<text x="258" y="138" text-anchor="middle" font-size="12" font-weight="500" fill="#27500a" font-family="Georgia,serif">Closed Won</text>
+<text x="258" y="152" text-anchor="middle" font-size="10" fill="#3b6d11" font-family="Georgia,serif">Contract signed</text>
+<text x="258" y="164" text-anchor="middle" font-size="10" fill="#3b6d11" font-family="Georgia,serif">Company name validated</text>
+<text x="258" y="176" text-anchor="middle" font-size="10" fill="#3b6d11" font-family="Georgia,serif">Handoff to CS</text>
+
+<!-- Closed Lost -->
+<line x1="426" y1="184" x2="426" y2="214" stroke="#5f5e5a" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#sarr)"/>
+<rect x="356" y="214" width="140" height="56" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="426" y="234" text-anchor="middle" font-size="12" font-weight="500" fill="#791f1f" font-family="Georgia,serif">Closed Lost</text>
+<text x="426" y="250" text-anchor="middle" font-size="10" fill="#a32d2d" font-family="Georgia,serif">Definitive no · door closed</text>
+<text x="426" y="262" text-anchor="middle" font-size="10" fill="#a32d2d" font-family="Georgia,serif">Revisit in years</text>
+
+<!-- Entry criteria callout -->
+<rect x="20" y="130" width="155" height="170" rx="8" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="97" y="152" text-anchor="middle" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Deal creation rule</text>
+<text x="97" y="170" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">A deal is created only</text>
+<text x="97" y="184" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">when there is a formal</text>
+<text x="97" y="198" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">discussion + expressed</text>
+<text x="97" y="212" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">interest. Not after a</text>
+<text x="97" y="226" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">conference intro or</text>
+<text x="97" y="240" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">unanswered email.</text>
+<text x="97" y="258" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif" font-style="italic">Buying signal required.</text>
+<text x="97" y="292" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Deal type: New Business</text>
+<text x="97" y="306" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">or Expansion</text>
+
+<!-- Note: Closed Ghosted deleted -->
+<rect x="20" y="360" width="640" height="76" rx="8" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="340" y="382" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">Historical gap: "Closed Ghosted" stage was deleted</text>
+<text x="340" y="400" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">There was a dedicated stage for prospects who went silent — never said no, just stopped responding. This was deleted and merged</text>
+<text x="340" y="416" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">into Closed Lost, making it impossible to distinguish lost deals from ghosted ones. This list was prime re-engagement material.</text>
+</svg>
+</div>
+
+<!-- ── DAILY WORKFLOW ── -->
+<div id="sales-daily" class="sales-panel" style="display:none;">
+<svg viewBox="0 0 680 560" style="display:block;width:100%;height:auto;">
+<defs>
+  <marker id="darr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- Inbound flow -->
+<rect x="20" y="20" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="32" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">INBOUND — prospect fills interest form on rosnet.com</text>
+
+<rect x="440" y="48" width="200" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="540" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Contact auto-created</text>
+<text x="540" y="82" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Email alert to sales team</text>
+
+<line x1="440" y1="70" x2="280" y2="70" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+<text x="358" y="62" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">manual decision: who takes it?</text>
+
+<!-- Outbound flow -->
+<rect x="20" y="110" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="122" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">OUTBOUND — rep works through account queue</text>
+
+<rect x="20" y="138" width="200" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="120" y="156" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Rep opens HubSpot</text>
+<text x="120" y="172" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Reviews task list + pipeline</text>
+
+<line x1="220" y1="160" x2="246" y2="160" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+
+<rect x="248" y="138" width="180" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="338" y="156" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Searches for company</text>
+<text x="338" y="172" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Verifies contact is correct</text>
+
+<line x1="428" y1="160" x2="454" y2="160" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+
+<rect x="456" y="138" width="200" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="556" y="156" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Executes outreach</text>
+<text x="556" y="172" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Call · email · LinkedIn</text>
+
+<!-- Two outcomes -->
+<line x1="556" y1="182" x2="556" y2="210" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+
+<rect x="20" y="226" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="238" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">RESPONSE OR NOT?</text>
+
+<line x1="556" y1="242" x2="556" y2="260" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="200" y1="260" x2="556" y2="260" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="200" y1="260" x2="200" y2="278" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+<line x1="556" y1="260" x2="556" y2="278" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+<text x="140" y="256" font-size="10" fill="#8a8880" font-family="Georgia,serif">responded</text>
+<text x="560" y="256" font-size="10" fill="#8a8880" font-family="Georgia,serif">no response</text>
+
+<rect x="20" y="278" width="360" height="56" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+<text x="200" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#27500a" font-family="Georgia,serif">Advance in pipeline</text>
+<text x="200" y="312" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Log activity on Company record</text>
+<text x="200" y="326" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Update deal stage + next steps</text>
+
+<rect x="440" y="278" width="220" height="56" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="550" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Continue outreach</text>
+<text x="550" y="312" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Set follow-up task</text>
+<text x="550" y="326" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Move to Nurture if no signal</text>
+
+<!-- Call logging -->
+<rect x="20" y="360" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="372" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">ACTIVITY LOGGING — how calls and emails are tracked today</text>
+
+<rect x="20" y="386" width="190" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="115" y="404" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Calls logged in HubSpot</text>
+<text x="115" y="420" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Via HubSpot call feature</text>
+<text x="115" y="434" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Tracked by dial count</text>
+
+<rect x="226" y="386" width="196" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="324" y="404" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Meetings via Fireflies</text>
+<text x="324" y="420" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Auto-joins Teams calls</text>
+<text x="324" y="434" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Sometimes must be invited manually</text>
+
+<rect x="438" y="386" width="202" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="539" y="404" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Emails via HubSpot</text>
+<text x="539" y="420" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Sent from HubSpot directly</text>
+<text x="539" y="434" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Or replied from Outlook (synced)</text>
+
+<!-- Task management -->
+<rect x="20" y="460" width="640" height="56" rx="6" fill="#eededfe" stroke="#534ab7" stroke-width="0.5" fill-opacity="0.3"/>
+<text x="340" y="480" text-anchor="middle" font-size="13" font-weight="500" fill="#26215c" font-family="Georgia,serif">Task management — how reps stay organized</text>
+<text x="340" y="498" text-anchor="middle" font-size="11" fill="#3c3489" font-family="Georgia,serif">Tasks are set on contacts and companies inside HubSpot. Every morning, follow-up tasks surface. Rep works through the list — call, email, LinkedIn.</text>
+
+</svg>
+</div>
+
+<!-- ── TOOLS & SYSTEMS ── -->
+<div id="sales-tools" class="sales-panel" style="display:none;">
+<svg viewBox="0 0 680 440" style="display:block;width:100%;height:auto;">
+
+<!-- HubSpot -->
+<rect x="20" y="20" width="190" height="180" rx="8" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
+<text x="115" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#085041" font-family="Georgia,serif">HubSpot</text>
+<text x="115" y="62" text-anchor="middle" font-size="11" fill="#085041" font-family="Georgia,serif">Primary sales tool</text>
+<text x="40" y="84" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Pipeline management</text>
+<text x="40" y="100" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Contact + company records</text>
+<text x="40" y="116" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Email logging + call tracking</text>
+<text x="40" y="132" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Task management</text>
+<text x="40" y="148" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Deal stages + forecast</text>
+<text x="40" y="164" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Calendar sync (Outlook)</text>
+<text x="40" y="180" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Fireflies transcripts</text>
+
+<!-- Apollo -->
+<rect x="230" y="20" width="190" height="180" rx="8" fill="#faeeda" stroke="#ba7517" stroke-width="1"/>
+<text x="325" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#633806" font-family="Georgia,serif">Apollo</text>
+<text x="325" y="62" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Contact enrichment</text>
+<text x="250" y="84" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Find contacts by company</text>
+<text x="250" y="100" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Email + phone data</text>
+<text x="250" y="116" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Push to HubSpot</text>
+<text x="250" y="140" font-size="11" fill="#a32d2d" font-family="Georgia,serif" font-weight="500">⚠ Currently broken</text>
+<text x="250" y="156" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Admin switch broke the</text>
+<text x="250" y="172" font-size="11" fill="#a32d2d" font-family="Georgia,serif">push connection. Contacts</text>
+<text x="250" y="188" font-size="11" fill="#a32d2d" font-family="Georgia,serif">entered manually for now.</text>
+
+<!-- PandaDoc -->
+<rect x="440" y="20" width="220" height="180" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="1"/>
+<text x="550" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">PandaDoc</text>
+<text x="550" y="62" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Contracts + agreements</text>
+<text x="460" y="84" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Electronic signature</text>
+<text x="460" y="100" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Formal agreements sent here</text>
+<text x="460" y="116" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· 5 years of contracts stored</text>
+<text x="460" y="140" font-size="11" fill="#a32d2d" font-family="Georgia,serif" font-weight="500">⚠ Not integrated w/ HubSpot</text>
+<text x="460" y="156" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Signed contracts not visible</text>
+<text x="460" y="172" font-size="11" fill="#a32d2d" font-family="Georgia,serif">in HubSpot. Built manually</text>
+<text x="460" y="188" font-size="11" fill="#a32d2d" font-family="Georgia,serif">by rep since EA left.</text>
+
+<!-- Fireflies -->
+<rect x="20" y="220" width="190" height="140" rx="8" fill="#eeedfe" stroke="#534ab7" stroke-width="1"/>
+<text x="115" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#3c3489" font-family="Georgia,serif">Fireflies AI</text>
+<text x="115" y="262" text-anchor="middle" font-size="11" fill="#534ab7" font-family="Georgia,serif">Meeting recording</text>
+<text x="40" y="284" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Auto-joins Teams meetings</text>
+<text x="40" y="300" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Transcripts uploaded</text>
+<text x="40" y="316" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Rep reviews + rates calls</text>
+<text x="40" y="332" font-size="11" fill="#a32d2d" font-family="Georgia,serif">· Doesn't always auto-join</text>
+<text x="40" y="348" font-size="11" fill="#a32d2d" font-family="Georgia,serif">· Sometimes needs manual invite</text>
+
+<!-- Outlook -->
+<rect x="230" y="220" width="190" height="140" rx="8" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/>
+<text x="325" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#0c447c" font-family="Georgia,serif">Outlook</text>
+<text x="325" y="262" text-anchor="middle" font-size="11" fill="#185fa5" font-family="Georgia,serif">Email + calendar</text>
+<text x="250" y="284" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Synced to HubSpot</text>
+<text x="250" y="300" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Emails logged on contact</text>
+<text x="250" y="316" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Calendar meetings visible</text>
+<text x="250" y="332" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Replies from Outlook synced</text>
+
+<!-- HubSpot calls -->
+<rect x="440" y="220" width="220" height="140" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="1"/>
+<text x="550" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">HubSpot Calls</text>
+<text x="550" y="262" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Outbound calling</text>
+<text x="460" y="284" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Dial directly from HubSpot</text>
+<text x="460" y="300" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Logged automatically</text>
+<text x="460" y="316" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Tracks dial count per rep</text>
+<text x="460" y="332" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Recorded calls reviewable</text>
+<text x="460" y="348" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· AI rating of call quality</text>
+
+</svg>
+</div>
+
+<!-- ── GAPS TODAY ── -->
+<div id="sales-gaps" class="sales-panel" style="display:none;">
+<svg viewBox="0 0 680 500" style="display:block;width:100%;height:auto;">
+
+<!-- Header -->
+<rect x="20" y="20" width="640" height="28" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="340" y="38" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">Active gaps in the sales process — confirmed from discovery sessions</text>
+
+<!-- Gap 1 -->
+<rect x="20" y="64" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="84" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">No deal distribution rule</text>
+<text x="40" y="102" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Inbound leads are assigned case</text>
+<text x="40" y="118" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">by case with no formal criteria.</text>
+<text x="40" y="134" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Not sustainable as the team grows.</text>
+<text x="40" y="146" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Define with Sales leadership</text>
+
+<!-- Gap 2 -->
+<rect x="360" y="64" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="84" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Apollo push broken</text>
+<text x="380" y="102" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Admin switch broke the Apollo →</text>
+<text x="380" y="118" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">HubSpot connection. Contacts</text>
+<text x="380" y="134" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">entered manually today.</text>
+<text x="380" y="146" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Bryan to fix Apollo admin connection</text>
+
+<!-- Gap 3 -->
+<rect x="20" y="170" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="190" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">PandaDoc not integrated</text>
+<text x="40" y="208" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">5 years of signed contracts live</text>
+<text x="40" y="224" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">only in PandaDoc. Not visible</text>
+<text x="40" y="240" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">in HubSpot at deal level.</text>
+<text x="40" y="252" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Build HubSpot ↔ PandaDoc integration</text>
+
+<!-- Gap 4 -->
+<rect x="360" y="170" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="190" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Company naming inconsistent</text>
+<text x="380" y="208" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Reps use site names, concept</text>
+<text x="380" y="224" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">names, or legal names depending</text>
+<text x="380" y="240" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">on what they know. Hierarchy lost.</text>
+<text x="380" y="252" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Two-name system + Closed Won validation</text>
+
+<!-- Gap 5 -->
+<rect x="20" y="276" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="296" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Closed Ghosted deleted</text>
+<text x="40" y="314" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">No way to separate prospects</text>
+<text x="40" y="330" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">who said no from those who</text>
+<text x="40" y="346" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">went silent. Prime re-engagement</text>
+<text x="40" y="358" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Recreate as Prospecting Status value</text>
+
+<!-- Gap 6 -->
+<rect x="360" y="276" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="296" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">No structured daily workspace</text>
+<text x="380" y="314" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Reps work from memory and</text>
+<text x="380" y="330" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">intuition. No prioritized queue,</text>
+<text x="380" y="346" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">no ICP scoring visible in HubSpot.</text>
+<text x="380" y="358" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ 4 saved views + ICP score (Phase 01)</text>
+
+<!-- Gap 7: Fireflies -->
+<rect x="20" y="382" width="300" height="76" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="402" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Fireflies doesn't always join</text>
+<text x="40" y="420" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Rep must manually invite Fireflies</text>
+<text x="40" y="436" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">to some meetings. Some calls</text>
+<text x="40" y="452" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Configure Fireflies auto-join rules</text>
+
+<!-- Gap 8: MRR vs ARR -->
+<rect x="360" y="382" width="300" height="76" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="402" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">MRR vs ARR confusion</text>
+<text x="380" y="420" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">4 deals above $300K likely</text>
+<text x="380" y="436" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">entered as ARR — inflating pipeline</text>
+<text x="380" y="452" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ MRR per store ≤ $500 validation rule</text>
+
+</svg>
+</div>
+
+<script>
+function showSales(id, btn) {
+  document.querySelectorAll('.sales-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('#sales-nav .tab-btn').forEach(b => b.classList.remove('s-active'));
+  document.getElementById('sales-' + id).style.display = 'block';
+  btn.classList.add('s-active');
+}
+</script>
+
+
+<h3 class="decision-title">Sales — questions to define</h3>
+<div class="decision-grid">
+  <div class="dec-card"><div class="dec-severity" style="background:#ba7517;"></div><div class="dec-body"><p class="dec-title">New concept for same legal entity: New Business or Expansion?</p><p class="dec-context">When an existing client adds a new concept, Sales needs a clear deal type rule. This affects pipeline categorization, expansion reporting, and forecast accuracy.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#ba7517;"></div><div class="dec-body"><p class="dec-title">Deal distribution rule between sales reps</p><p class="dec-context">Inbound leads are assigned case by case today. Define whether distribution should be by geography, segment, concept type, ownership, or rotation.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#5f5e5a;"></div><div class="dec-body"><p class="dec-title">ICP Score criteria</p><p class="dec-context">Define High / Medium / Low criteria before configuring prioritization views in HubSpot. Possible inputs: location count, concept type, ownership model, geography, and current tech stack.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#5f5e5a;"></div><div class="dec-body"><p class="dec-title">Deal naming and searchable site name</p><p class="dec-context">Deal naming is [Operator] — [Concept], but reps also search by internal site name. Decide whether site name appears in the deal name or as a separate searchable field.</p></div></div>
+</div>
+
+</section>
+
+<section id="area-finance" class="area-panel">
+  <div class="section-title"><h2>Finance overview</h2><p>Billing setup, Maxio, first billing, location changes, monthly cycle, gaps, and decisions to define.</p></div>
+  <div class="area-intro">
+    <div class="area-card"><h3>Purpose</h3><p>Translate signed contracts, implementation readiness, locations, modules, and billing entities into accurate Maxio billing.</p></div>
+    <div class="area-card"><h3>Core rule</h3><p>Maxio subscription = Site. MRR lives at subscription level. Billing entity structure depends on client preference.</p></div>
+    <div class="area-card"><h3>Main risks</h3><p>Manual entry, site_id not searchable at customer level, and multiple quantity updates per module for location changes.</p></div>
+  </div>
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('new-client',this)">New client</button>
+    <button class="tab-btn" onclick="showTab('first-billing',this)">First billing</button>
+    <button class="tab-btn" onclick="showTab('loc-open',this)">Location opens</button>
+    <button class="tab-btn" onclick="showTab('loc-close',this)">Location closes</button>
+    <button class="tab-btn" onclick="showTab('monthly',this)">Monthly cycle</button>
+  </div>
 <!-- ── NEW CLIENT ── -->
 <div id="tab-new-client" class="tab-panel active">
 <svg viewBox="0 0 680 680">
@@ -513,371 +934,27 @@ function showTab(id, btn) {
 </script>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     SALES PROCESS SECTION
-════════════════════════════════════════════════════════════════ -->
-<hr style="margin: 48px 0 40px; border: none; border-top: 1px solid #eceae3;">
 
-<div style="margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #eceae3;">
-  <h2 style="font-size: 22px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 4px; font-family: Georgia, serif;">Sales process — how it works today</h2>
-  <p style="font-size: 14px; color: #5f5e5a; font-style: italic; font-family: Georgia, serif;">Consolidated from discovery sessions with the sales team · May 2026</p>
+<h3 class="decision-title">Finance — questions to define</h3>
+<div class="decision-grid">
+  <div class="dec-card"><div class="dec-severity" style="background:#a32d2d;"></div><div class="dec-body"><p class="dec-title">Fix site_id in Maxio — subscription level vs customer level</p><p class="dec-context">The rosnet_site_id currently exists at subscription level only. Finance and the tech team need to decide how to expose it at the customer / billing entity level so HubSpot ↔ Maxio sync can work.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#ba7517;"></div><div class="dec-body"><p class="dec-title">Should Billing Sub-Entities exist in HubSpot?</p><p class="dec-context">Billing structure varies by client. Decide whether billing sub-entities remain Maxio-only or become visible in HubSpot for reps and CS.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#5f5e5a;"></div><div class="dec-body"><p class="dec-title">Location tracking: count field or start/end dates?</p><p class="dec-context">Decide whether HubSpot only needs a location count per Site, or whether each location needs lifecycle dates for billing and reporting.</p></div></div>
 </div>
 
-<!-- Sales tabs -->
-<div class="tab-nav" id="sales-nav">
-  <button class="tab-btn s-active" onclick="showSales('pipeline',this)">Pipeline stages</button>
-  <button class="tab-btn" onclick="showSales('daily',this)">Daily workflow</button>
-  <button class="tab-btn" onclick="showSales('tools',this)">Tools & systems</button>
-  <button class="tab-btn" onclick="showSales('gaps',this)">Gaps today</button>
-</div>
+</section>
 
-<style>
-.tab-btn.s-active { color: #1a1a18; border-bottom-color: #1a1a18; }
-</style>
-
-<!-- ── PIPELINE STAGES ── -->
-<div id="sales-pipeline" class="sales-panel" style="display:block;">
-<svg viewBox="0 0 680 560" style="display:block;width:100%;height:auto;">
-<defs>
-  <marker id="sarr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </marker>
-</defs>
-
-<!-- Contacts (pre-pipeline) -->
-<rect x="20" y="20" width="140" height="64" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="90" y="40" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Contacts only</text>
-<text x="90" y="56" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Met at conference</text>
-<text x="90" y="70" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">No email reply yet</text>
-
-<!-- Arrow to pipeline -->
-<line x1="160" y1="52" x2="186" y2="52" stroke="#5f5e5a" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#sarr)"/>
-<text x="172" y="44" text-anchor="middle" font-size="9" fill="#8a8880" font-family="Georgia,serif">buying signal</text>
-
-<!-- Stage 1: Discovery -->
-<rect x="188" y="20" width="140" height="64" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
-<text x="258" y="38" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Discovery</text>
-<text x="258" y="52" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">First demo booked</text>
-<text x="258" y="64" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Understand the group</text>
-<text x="258" y="76" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Confirm fit</text>
-<line x1="328" y1="52" x2="354" y2="52" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
-
-<!-- Stage 2: Solution Fit -->
-<rect x="356" y="20" width="140" height="64" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
-<text x="426" y="38" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Solution Fit</text>
-<text x="426" y="52" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Follow-up demos</text>
-<text x="426" y="64" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Deeper dive into modules</text>
-<text x="426" y="76" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Custom tailor the pitch</text>
-<line x1="496" y1="52" x2="522" y2="52" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
-
-<!-- Stage 3: Proposal -->
-<rect x="524" y="20" width="140" height="64" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
-<text x="594" y="38" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Proposal</text>
-<text x="594" y="52" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Pricing sent by email</text>
-<text x="594" y="64" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Prospect reviews</text>
-<text x="594" y="76" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Discussion / negotiation</text>
-
-<!-- Second row -->
-<line x1="594" y1="84" x2="594" y2="110" stroke="#5f5e5a" stroke-width="1"/>
-<line x1="594" y1="110" x2="426" y2="110" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
-
-<!-- Stage 4: Agreements -->
-<rect x="356" y="120" width="140" height="64" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="1"/>
-<text x="426" y="138" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Agreements</text>
-<text x="426" y="152" text-anchor="middle" font-size="10" fill="#854f0b" font-family="Georgia,serif">PandaDoc sent</text>
-<text x="426" y="164" text-anchor="middle" font-size="10" fill="#854f0b" font-family="Georgia,serif">Terms agreed · waiting for</text>
-<text x="426" y="176" text-anchor="middle" font-size="10" fill="#854f0b" font-family="Georgia,serif">signature</text>
-<line x1="356" y1="152" x2="330" y2="152" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
-
-<!-- Stage 5: Closed Won -->
-<rect x="188" y="120" width="140" height="64" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/>
-<text x="258" y="138" text-anchor="middle" font-size="12" font-weight="500" fill="#27500a" font-family="Georgia,serif">Closed Won</text>
-<text x="258" y="152" text-anchor="middle" font-size="10" fill="#3b6d11" font-family="Georgia,serif">Contract signed</text>
-<text x="258" y="164" text-anchor="middle" font-size="10" fill="#3b6d11" font-family="Georgia,serif">Company name validated</text>
-<text x="258" y="176" text-anchor="middle" font-size="10" fill="#3b6d11" font-family="Georgia,serif">Handoff to CS</text>
-
-<!-- Closed Lost -->
-<line x1="426" y1="184" x2="426" y2="214" stroke="#5f5e5a" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#sarr)"/>
-<rect x="356" y="214" width="140" height="56" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
-<text x="426" y="234" text-anchor="middle" font-size="12" font-weight="500" fill="#791f1f" font-family="Georgia,serif">Closed Lost</text>
-<text x="426" y="250" text-anchor="middle" font-size="10" fill="#a32d2d" font-family="Georgia,serif">Definitive no · door closed</text>
-<text x="426" y="262" text-anchor="middle" font-size="10" fill="#a32d2d" font-family="Georgia,serif">Revisit in years</text>
-
-<!-- Entry criteria callout -->
-<rect x="20" y="130" width="155" height="170" rx="8" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
-<text x="97" y="152" text-anchor="middle" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Deal creation rule</text>
-<text x="97" y="170" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">A deal is created only</text>
-<text x="97" y="184" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">when there is a formal</text>
-<text x="97" y="198" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">discussion + expressed</text>
-<text x="97" y="212" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">interest. Not after a</text>
-<text x="97" y="226" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">conference intro or</text>
-<text x="97" y="240" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">unanswered email.</text>
-<text x="97" y="258" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif" font-style="italic">Buying signal required.</text>
-<text x="97" y="292" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Deal type: New Business</text>
-<text x="97" y="306" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">or Expansion</text>
-
-<!-- Note: Closed Ghosted deleted -->
-<rect x="20" y="360" width="640" height="76" rx="8" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
-<text x="340" y="382" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">Historical gap: "Closed Ghosted" stage was deleted</text>
-<text x="340" y="400" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">There was a dedicated stage for prospects who went silent — never said no, just stopped responding. This was deleted and merged</text>
-<text x="340" y="416" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">into Closed Lost, making it impossible to distinguish lost deals from ghosted ones. This list was prime re-engagement material.</text>
-
-<!-- Note: rename Negotiation -->
-<rect x="20" y="456" width="640" height="56" rx="8" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
-<text x="340" y="476" text-anchor="middle" font-size="13" font-weight="500" fill="#ba7517" font-family="Georgia,serif">Proposed rename: Negotiation → Agreements</text>
-<text x="340" y="494" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">"Negotiation" is a misnomer — by the time PandaDoc is sent, terms are already agreed. The stage is about waiting for signature. "Agreements" is more accurate.</text>
-
-</svg>
-</div>
-
-<!-- ── DAILY WORKFLOW ── -->
-<div id="sales-daily" class="sales-panel" style="display:none;">
-<svg viewBox="0 0 680 560" style="display:block;width:100%;height:auto;">
-<defs>
-  <marker id="darr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </marker>
-</defs>
-
-<!-- Inbound flow -->
-<rect x="20" y="20" width="640" height="16" rx="3" fill="#eceae3"/>
-<text x="340" y="32" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">INBOUND — prospect fills interest form on rosnet.com</text>
-
-<rect x="440" y="48" width="200" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="540" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Contact auto-created</text>
-<text x="540" y="82" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Email alert to sales team</text>
-
-<line x1="440" y1="70" x2="280" y2="70" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
-<text x="358" y="62" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">manual decision: who takes it?</text>
-
-<!-- Outbound flow -->
-<rect x="20" y="110" width="640" height="16" rx="3" fill="#eceae3"/>
-<text x="340" y="122" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">OUTBOUND — rep works through account queue</text>
-
-<rect x="20" y="138" width="200" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
-<text x="120" y="156" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Rep opens HubSpot</text>
-<text x="120" y="172" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Reviews task list + pipeline</text>
-
-<line x1="220" y1="160" x2="246" y2="160" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
-
-<rect x="248" y="138" width="180" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
-<text x="338" y="156" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Searches for company</text>
-<text x="338" y="172" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Verifies contact is correct</text>
-
-<line x1="428" y1="160" x2="454" y2="160" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
-
-<rect x="456" y="138" width="200" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
-<text x="556" y="156" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Executes outreach</text>
-<text x="556" y="172" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Call · email · LinkedIn</text>
-
-<!-- Two outcomes -->
-<line x1="556" y1="182" x2="556" y2="210" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
-
-<rect x="20" y="226" width="640" height="16" rx="3" fill="#eceae3"/>
-<text x="340" y="238" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">RESPONSE OR NOT?</text>
-
-<line x1="556" y1="242" x2="556" y2="260" stroke="#5f5e5a" stroke-width="1"/>
-<line x1="200" y1="260" x2="556" y2="260" stroke="#5f5e5a" stroke-width="1"/>
-<line x1="200" y1="260" x2="200" y2="278" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
-<line x1="556" y1="260" x2="556" y2="278" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
-<text x="140" y="256" font-size="10" fill="#8a8880" font-family="Georgia,serif">responded</text>
-<text x="560" y="256" font-size="10" fill="#8a8880" font-family="Georgia,serif">no response</text>
-
-<rect x="20" y="278" width="360" height="56" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
-<text x="200" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#27500a" font-family="Georgia,serif">Advance in pipeline</text>
-<text x="200" y="312" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Log activity on Company record</text>
-<text x="200" y="326" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Update deal stage + next steps</text>
-
-<rect x="440" y="278" width="220" height="56" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="550" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Continue outreach</text>
-<text x="550" y="312" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Set follow-up task</text>
-<text x="550" y="326" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Move to Nurture if no signal</text>
-
-<!-- Call logging -->
-<rect x="20" y="360" width="640" height="16" rx="3" fill="#eceae3"/>
-<text x="340" y="372" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">ACTIVITY LOGGING — how calls and emails are tracked today</text>
-
-<rect x="20" y="386" width="190" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
-<text x="115" y="404" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Calls logged in HubSpot</text>
-<text x="115" y="420" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Via HubSpot call feature</text>
-<text x="115" y="434" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Tracked by dial count</text>
-
-<rect x="226" y="386" width="196" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
-<text x="324" y="404" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Meetings via Fireflies</text>
-<text x="324" y="420" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Auto-joins Teams calls</text>
-<text x="324" y="434" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Sometimes must be invited manually</text>
-
-<rect x="438" y="386" width="202" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
-<text x="539" y="404" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Emails via HubSpot</text>
-<text x="539" y="420" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Sent from HubSpot directly</text>
-<text x="539" y="434" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Or replied from Outlook (synced)</text>
-
-<!-- Task management -->
-<rect x="20" y="460" width="640" height="56" rx="6" fill="#eededfe" stroke="#534ab7" stroke-width="0.5" fill-opacity="0.3"/>
-<text x="340" y="480" text-anchor="middle" font-size="13" font-weight="500" fill="#26215c" font-family="Georgia,serif">Task management — how reps stay organized</text>
-<text x="340" y="498" text-anchor="middle" font-size="11" fill="#3c3489" font-family="Georgia,serif">Tasks are set on contacts and companies inside HubSpot. Every morning, follow-up tasks surface. Rep works through the list — call, email, LinkedIn.</text>
-
-</svg>
-</div>
-
-<!-- ── TOOLS & SYSTEMS ── -->
-<div id="sales-tools" class="sales-panel" style="display:none;">
-<svg viewBox="0 0 680 440" style="display:block;width:100%;height:auto;">
-
-<!-- HubSpot -->
-<rect x="20" y="20" width="190" height="180" rx="8" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
-<text x="115" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#085041" font-family="Georgia,serif">HubSpot</text>
-<text x="115" y="62" text-anchor="middle" font-size="11" fill="#085041" font-family="Georgia,serif">Primary sales tool</text>
-<text x="40" y="84" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Pipeline management</text>
-<text x="40" y="100" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Contact + company records</text>
-<text x="40" y="116" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Email logging + call tracking</text>
-<text x="40" y="132" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Task management</text>
-<text x="40" y="148" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Deal stages + forecast</text>
-<text x="40" y="164" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Calendar sync (Outlook)</text>
-<text x="40" y="180" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Fireflies transcripts</text>
-
-<!-- Apollo -->
-<rect x="230" y="20" width="190" height="180" rx="8" fill="#faeeda" stroke="#ba7517" stroke-width="1"/>
-<text x="325" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#633806" font-family="Georgia,serif">Apollo</text>
-<text x="325" y="62" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Contact enrichment</text>
-<text x="250" y="84" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Find contacts by company</text>
-<text x="250" y="100" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Email + phone data</text>
-<text x="250" y="116" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Push to HubSpot</text>
-<text x="250" y="140" font-size="11" fill="#a32d2d" font-family="Georgia,serif" font-weight="500">⚠ Currently broken</text>
-<text x="250" y="156" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Admin switch broke the</text>
-<text x="250" y="172" font-size="11" fill="#a32d2d" font-family="Georgia,serif">push connection. Contacts</text>
-<text x="250" y="188" font-size="11" fill="#a32d2d" font-family="Georgia,serif">entered manually for now.</text>
-
-<!-- PandaDoc -->
-<rect x="440" y="20" width="220" height="180" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="1"/>
-<text x="550" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">PandaDoc</text>
-<text x="550" y="62" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Contracts + agreements</text>
-<text x="460" y="84" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Electronic signature</text>
-<text x="460" y="100" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Formal agreements sent here</text>
-<text x="460" y="116" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· 5 years of contracts stored</text>
-<text x="460" y="140" font-size="11" fill="#a32d2d" font-family="Georgia,serif" font-weight="500">⚠ Not integrated w/ HubSpot</text>
-<text x="460" y="156" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Signed contracts not visible</text>
-<text x="460" y="172" font-size="11" fill="#a32d2d" font-family="Georgia,serif">in HubSpot. Built manually</text>
-<text x="460" y="188" font-size="11" fill="#a32d2d" font-family="Georgia,serif">by rep since EA left.</text>
-
-<!-- Fireflies -->
-<rect x="20" y="220" width="190" height="140" rx="8" fill="#eeedfe" stroke="#534ab7" stroke-width="1"/>
-<text x="115" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#3c3489" font-family="Georgia,serif">Fireflies AI</text>
-<text x="115" y="262" text-anchor="middle" font-size="11" fill="#534ab7" font-family="Georgia,serif">Meeting recording</text>
-<text x="40" y="284" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Auto-joins Teams meetings</text>
-<text x="40" y="300" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Transcripts uploaded</text>
-<text x="40" y="316" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Rep reviews + rates calls</text>
-<text x="40" y="332" font-size="11" fill="#a32d2d" font-family="Georgia,serif">· Doesn't always auto-join</text>
-<text x="40" y="348" font-size="11" fill="#a32d2d" font-family="Georgia,serif">· Sometimes needs manual invite</text>
-
-<!-- Outlook -->
-<rect x="230" y="220" width="190" height="140" rx="8" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/>
-<text x="325" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#0c447c" font-family="Georgia,serif">Outlook</text>
-<text x="325" y="262" text-anchor="middle" font-size="11" fill="#185fa5" font-family="Georgia,serif">Email + calendar</text>
-<text x="250" y="284" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Synced to HubSpot</text>
-<text x="250" y="300" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Emails logged on contact</text>
-<text x="250" y="316" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Calendar meetings visible</text>
-<text x="250" y="332" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Replies from Outlook synced</text>
-
-<!-- HubSpot calls -->
-<rect x="440" y="220" width="220" height="140" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="1"/>
-<text x="550" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">HubSpot Calls</text>
-<text x="550" y="262" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Outbound calling</text>
-<text x="460" y="284" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Dial directly from HubSpot</text>
-<text x="460" y="300" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Logged automatically</text>
-<text x="460" y="316" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Tracks dial count per rep</text>
-<text x="460" y="332" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Recorded calls reviewable</text>
-<text x="460" y="348" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· AI rating of call quality</text>
-
-</svg>
-</div>
-
-<!-- ── GAPS TODAY ── -->
-<div id="sales-gaps" class="sales-panel" style="display:none;">
-<svg viewBox="0 0 680 500" style="display:block;width:100%;height:auto;">
-
-<!-- Header -->
-<rect x="20" y="20" width="640" height="28" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
-<text x="340" y="38" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">Active gaps in the sales process — confirmed from discovery sessions</text>
-
-<!-- Gap 1 -->
-<rect x="20" y="64" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="40" y="84" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">No deal distribution rule</text>
-<text x="40" y="102" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Inbound leads are assigned case</text>
-<text x="40" y="118" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">by case with no formal criteria.</text>
-<text x="40" y="134" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Not sustainable as the team grows.</text>
-<text x="40" y="146" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Define with Sales leadership</text>
-
-<!-- Gap 2 -->
-<rect x="360" y="64" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="380" y="84" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Apollo push broken</text>
-<text x="380" y="102" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Admin switch broke the Apollo →</text>
-<text x="380" y="118" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">HubSpot connection. Contacts</text>
-<text x="380" y="134" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">entered manually today.</text>
-<text x="380" y="146" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Bryan to fix Apollo admin connection</text>
-
-<!-- Gap 3 -->
-<rect x="20" y="170" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="40" y="190" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">PandaDoc not integrated</text>
-<text x="40" y="208" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">5 years of signed contracts live</text>
-<text x="40" y="224" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">only in PandaDoc. Not visible</text>
-<text x="40" y="240" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">in HubSpot at deal level.</text>
-<text x="40" y="252" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Build HubSpot ↔ PandaDoc integration</text>
-
-<!-- Gap 4 -->
-<rect x="360" y="170" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="380" y="190" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Company naming inconsistent</text>
-<text x="380" y="208" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Reps use site names, concept</text>
-<text x="380" y="224" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">names, or legal names depending</text>
-<text x="380" y="240" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">on what they know. Hierarchy lost.</text>
-<text x="380" y="252" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Two-name system + Closed Won validation</text>
-
-<!-- Gap 5 -->
-<rect x="20" y="276" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="40" y="296" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Closed Ghosted deleted</text>
-<text x="40" y="314" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">No way to separate prospects</text>
-<text x="40" y="330" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">who said no from those who</text>
-<text x="40" y="346" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">went silent. Prime re-engagement</text>
-<text x="40" y="358" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Recreate as Prospecting Status value</text>
-
-<!-- Gap 6 -->
-<rect x="360" y="276" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="380" y="296" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">No structured daily workspace</text>
-<text x="380" y="314" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Reps work from memory and</text>
-<text x="380" y="330" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">intuition. No prioritized queue,</text>
-<text x="380" y="346" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">no ICP scoring visible in HubSpot.</text>
-<text x="380" y="358" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ 4 saved views + ICP score (Phase 01)</text>
-
-<!-- Gap 7: Fireflies -->
-<rect x="20" y="382" width="300" height="76" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="40" y="402" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Fireflies doesn't always join</text>
-<text x="40" y="420" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Rep must manually invite Fireflies</text>
-<text x="40" y="436" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">to some meetings. Some calls</text>
-<text x="40" y="452" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Configure Fireflies auto-join rules</text>
-
-<!-- Gap 8: MRR vs ARR -->
-<rect x="360" y="382" width="300" height="76" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
-<text x="380" y="402" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">MRR vs ARR confusion</text>
-<text x="380" y="420" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">4 deals above $300K likely</text>
-<text x="380" y="436" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">entered as ARR — inflating pipeline</text>
-<text x="380" y="452" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ MRR per store ≤ $500 validation rule</text>
-
-</svg>
-</div>
-
-<script>
-function showSales(id, btn) {
-  document.querySelectorAll('.sales-panel').forEach(p => p.style.display = 'none');
-  document.querySelectorAll('#sales-nav .tab-btn').forEach(b => b.classList.remove('s-active'));
-  document.getElementById('sales-' + id).style.display = 'block';
-  btn.classList.add('s-active');
-}
-</script>
-
+<section id="area-crm" class="area-panel">
+  <div class="section-title"><h2>CRM overview</h2><p>Account hierarchy, CS handoff, account ownership, activity logging, data architecture, gaps, and decisions to define.</p></div>
+  <div class="area-intro">
+    <div class="area-card"><h3>Purpose</h3><p>Make HubSpot the operational center for account history, ownership, hierarchy, renewals, and cross-system visibility.</p></div>
+    <div class="area-card"><h3>Core rule</h3><p>Company-level activity is the shared history. Sales can own deals while CS owns the account after Closed Won.</p></div>
+    <div class="area-card"><h3>Main risks</h3><p>Incorrect hierarchy, CS meetings contaminating Sales deals, broken rollups, missing contract renewal tracking, and unsupported SOW revenue.</p></div>
+  </div>
 <!-- ═══════════════════════════════════════════════════════════════
      CRM / CS TEAM SECTION
 ════════════════════════════════════════════════════════════════ -->
-<hr style="margin: 48px 0 40px; border: none; border-top: 1px solid #eceae3;">
+
 
 <div style="margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #eceae3;">
   <h2 style="font-size: 22px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 4px; font-family: Georgia, serif;">CRM / CS team — how it works today</h2>
@@ -962,13 +1039,13 @@ function showSales(id, btn) {
 <!-- Note: coexistence is fine -->
 <rect x="20" y="354" width="640" height="56" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
 <text x="340" y="374" text-anchor="middle" font-size="13" font-weight="500" fill="#27500a" font-family="Georgia,serif">Sales and CS activity on the same Company record is expected</text>
-<text x="340" y="392" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">When Sales opens an expansion deal for an existing client, their communication is on the same Company. CS and Sales timelines coexist — this is by design.</text>
+<text x="340" y="392" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">CS and Sales timelines coexist — this is by design.</text>
 
 <!-- Contract renewal — new urgent note -->
 <rect x="20" y="430" width="640" height="76" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
 <text x="340" y="450" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">URGENT — contract renewals: no tracking infrastructure exists</text>
-<text x="340" y="468" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">The first contract with a term limit (1-year and 3-year options) was sent May 28, 2026. All previous contracts were evergreen — no expiration tracking was ever needed.</text>
-<text x="340" y="484" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">No system, no reminder, no automation exists today. Proposed fix: Contract as a custom HubSpot object with end date + automated renewal reminders.</text>
+<text x="340" y="468" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">The first contract with a term limit was sent May 28, 2026.</text>
+<text x="340" y="484" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">Proposed fix: Contract as a custom HubSpot object with end date + automated renewal reminders.</text>
 
 </svg>
 </div>
@@ -1227,10 +1304,11 @@ function showCrm(id, btn) {
 </script>
 
 
+
 <!-- ═══════════════════════════════════════════════════════════════
      HIERARCHY SECTION
 ════════════════════════════════════════════════════════════════ -->
-<hr style="margin: 48px 0 40px; border: none; border-top: 1px solid #eceae3;">
+
 
 <div style="margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #eceae3;">
   <h2 style="font-size: 22px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 4px; font-family: Georgia, serif;">Account hierarchy</h2>
@@ -1451,355 +1529,28 @@ function toggleHier(id) {
 }
 </script>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     DECISIONS NEEDED SECTION
-════════════════════════════════════════════════════════════════ -->
-<hr style="margin: 48px 0 40px; border: none; border-top: 1px solid #eceae3;">
 
-<div style="margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #eceae3;">
-  <h2 style="font-size: 22px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 4px; font-family: Georgia, serif;">Decisions needed</h2>
-  <p style="font-size: 14px; color: #5f5e5a; font-style: italic; font-family: Georgia, serif;">These must be resolved before configuration can begin. Sorted by urgency.</p>
+<h3 class="decision-title">CRM — questions to define</h3>
+<div class="decision-grid">
+  <div class="dec-card"><div class="dec-severity" style="background:#a32d2d;"></div><div class="dec-body"><p class="dec-title">Integration architecture: aggregate fields or Site custom object?</p><p class="dec-context">Decide whether HubSpot should use aggregate fields on Company as a short-term fallback, or create a Site custom object as the long-term architecture.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#a32d2d;"></div><div class="dec-body"><p class="dec-title">Contract renewal tracking infrastructure</p><p class="dec-context">Term-limited contracts now exist. Decide whether contracts become a HubSpot custom object, who owns renewals, and what reminders are required.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#a32d2d;"></div><div class="dec-body"><p class="dec-title">Companies owned by departed employee</p><p class="dec-context">Confirm with Jack whether Kacie-owned company records can be reassigned, given the legal sensitivity flagged by Phil.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#ba7517;"></div><div class="dec-body"><p class="dec-title">SOWs / professional services tracking</p><p class="dec-context">SOW revenue is invisible in HubSpot today. Decide whether SOWs live in a CS pipeline, as a custom deal type, or as a custom object.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#ba7517;"></div><div class="dec-body"><p class="dec-title">HubSpot auto-company creation from inbound emails</p><p class="dec-context">Decide whether to disable the automation or create a suppression rule / Vendor lifecycle to stop vendors and irrelevant contacts from inflating company records.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#ba7517;"></div><div class="dec-body"><p class="dec-title">Fireflies / CS pipeline separation</p><p class="dec-context">Confirm whether the target is one Fireflies workspace with separate Sales and CS pipelines in HubSpot, so Company history stays unified without contaminating Sales deals.</p></div></div>
+  <div class="dec-card"><div class="dec-severity" style="background:#5f5e5a;"></div><div class="dec-body"><p class="dec-title">Naming conventions — Company, Site, Contact</p><p class="dec-context">Agree naming standards before deduplication begins: legal company name, site alias, parent company, and contact naming conventions.</p></div></div>
 </div>
 
-<style>
-.dec-group-title {
-  font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em;
-  color: #8a8880; font-family: Georgia, serif; margin: 24px 0 10px;
-}
-.dec-group-title:first-child { margin-top: 0; }
-.dec-card {
-  display: flex; gap: 0; border-radius: 8px; overflow: hidden;
-  border: 1px solid #d3d1c7; margin-bottom: 8px;
-}
-.dec-severity {
-  width: 6px; min-width: 6px; flex-shrink: 0;
-}
-.dec-body { padding: 14px 16px; flex: 1; background: #fafaf8; }
-.dec-title { font-size: 14px; font-weight: 500; font-family: Georgia, serif; color: #1a1a18; margin: 0 0 6px; }
-.dec-context { font-size: 13px; font-family: Georgia, serif; color: #5f5e5a; margin: 0; line-height: 1.6; }
-.dec-context strong { color: #2c2c2a; font-weight: 500; }
-</style>
-
-<p class="dec-group-title">Critical — blocking architecture and integration</p>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#a32d2d;"></div>
-  <div class="dec-body">
-    <p class="dec-title">Integration architecture: Option A or Option B?</p>
-    <p class="dec-context"><strong>Option A:</strong> Aggregate fields directly on the Company record (MRR, location count, products). Fast to implement, no new objects. Fragile — sync relies on name matching, breaks with any rename. Technical debt.<br><strong>Option B:</strong> Site as a custom HubSpot object, associated via rosnet_site_id. Correct architecture. Data flows cleanly at site level. More complex — requires whiteboard session with Jack + Josh verification. Recommended. <strong>Everything else depends on this decision.</strong></p>
-  </div>
-</div>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#a32d2d;"></div>
-  <div class="dec-body">
-    <p class="dec-title">Fix site_id in Maxio — move from subscription to customer level</p>
-    <p class="dec-context">The rosnet_site_id currently only exists at the subscription level in Maxio — not at the customer/billing entity level. This means you cannot search for a billing entity by site name. Any HubSpot ↔ Maxio sync will fail without this fix. <strong>Must be resolved with the Finance and tech team before any integration work begins.</strong></p>
-  </div>
-</div>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#a32d2d;"></div>
-  <div class="dec-body">
-    <p class="dec-title">Contract renewal tracking — what is the infrastructure?</p>
-    <p class="dec-context">The first contract with a term limit (1-year and 3-year options) was sent on May 28, 2026. All previous contracts were evergreen — no renewal tracking was ever needed. No system, reminder, or automation exists today. <strong>Proposed: Contract as a custom HubSpot object with end date field and automated reminders. Who owns the design and configuration of this?</strong></p>
-  </div>
-</div>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#a32d2d;"></div>
-  <div class="dec-body">
-    <p class="dec-title">Companies owned by departed employee — reassign or not?</p>
-    <p class="dec-context">A former team member owns 876 Company records in HubSpot. 0 are active clients. 493 have no lifecycle stage. She has been on indefinite leave for 4 months with no official status update. <strong>This is a legal situation — cannot reassign without explicit approval from leadership. A decision is needed before cleanup can proceed.</strong></p>
-  </div>
-</div>
-
-<p class="dec-group-title">High — blocking cleanup and configuration</p>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#ba7517;"></div>
-  <div class="dec-body">
-    <p class="dec-title">New concept for same legal entity: New Business or Expansion?</p>
-    <p class="dec-context">When a current client adds a new concept (e.g. Sun Holdings already has Bar Louie on ROSnet and now wants to add Popeyes), what deal type should Sales use? The taxonomy is ambiguous today — some reps mark it as New Business, others as Expansion. <strong>This affects pipeline reporting, commission calculation, and how the deal type field is configured in HubSpot.</strong></p>
-  </div>
-</div>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#ba7517;"></div>
-  <div class="dec-body">
-    <p class="dec-title">HubSpot auto-creates a Company from every inbound email — disable?</p>
-    <p class="dec-context">An active HubSpot automation creates a new Company record for every inbound email — including vendors, payroll companies, and irrelevant contacts. This is inflating the company count daily and polluting the CRM. <strong>Options: disable the automation entirely, or create a "Vendor / Other" lifecycle stage to filter these out from client views.</strong></p>
-  </div>
-</div>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#ba7517;"></div>
-  <div class="dec-body">
-    <p class="dec-title">Statements of Work — where are they tracked?</p>
-    <p class="dec-context">The CS team sends SOWs (professional services) to existing clients. This is real revenue that does not appear in any deal or pipeline in HubSpot today — completely invisible to leadership. <strong>Should SOWs live in a separate CS pipeline, as a custom deal type, or as a custom object? Needs a decision before the CS pipeline is designed.</strong></p>
-  </div>
-</div>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#ba7517;"></div>
-  <div class="dec-body">
-    <p class="dec-title">Should billing sub-entities become a HubSpot object?</p>
-    <p class="dec-context">Billing sub-entities currently live in Maxio only. Some clients (like Hamra with 4 billing entities) have complex billing structures. Today, sub-entities are being confused with Companies — creating duplicate records. <strong>Should they become a custom object in HubSpot, or remain Maxio-only and be represented via fields on the Site object? Requires data team input.</strong></p>
-  </div>
-</div>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#ba7517;"></div>
-  <div class="dec-body">
-    <p class="dec-title">Deal distribution rule between sales reps</p>
-    <p class="dec-context">When an inbound lead comes through the website form, there is no formal rule for which rep takes it. The decision is made case by case. <strong>As the team grows, this is unsustainable. A distribution rule is needed — by geography, by segment, by concept type, or by rotation.</strong></p>
-  </div>
-</div>
-
-<p class="dec-group-title">Medium — needed for naming and data cleanup</p>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#5f5e5a;"></div>
-  <div class="dec-body">
-    <p class="dec-title">ICP Score criteria — what defines High, Medium, Low?</p>
-    <p class="dec-context">The ICP Score (High / Medium / Low) needs to be defined before it can be configured in HubSpot. Possible criteria: location count, concept type (QSR vs casual dining), ownership model, geography, or a weighted combination. <strong>Currently scored via Apollo export but invisible in HubSpot — needs validation with Sales leadership.</strong></p>
-  </div>
-</div>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#5f5e5a;"></div>
-  <div class="dec-body">
-    <p class="dec-title">Naming conventions — Company, Site, Contact</p>
-    <p class="dec-context">Deal naming is confirmed: [Operator] — [Concept]. All other naming conventions are still TBD: Company (legal name vs DBA), Site ([site_id] — [descriptive name]), Contact (First Last (Role)). <strong>These must be agreed before deduplication begins — you cannot deduplicate with inconsistent names.</strong></p>
-  </div>
-</div>
-
-<div class="dec-card">
-  <div class="dec-severity" style="background:#5f5e5a;"></div>
-  <div class="dec-body">
-    <p class="dec-title">Does the site name go in the deal name or as a separate field?</p>
-    <p class="dec-context">Sales reps search by site name (e.g. AZCHEBA, DOHERTY) — not by legal operator name. The confirmed deal name convention is [Operator] — [Concept]. <strong>Should the site name also appear in the deal name, or only as a separate searchable field? Both must be accessible to reps. Tom: "I know what we refer to them as in Rosnet."</strong></p>
-  </div>
-</div>
-
-
-
-<!-- EXPORT BAR -->
-<div class="export-bar">
-  <div style="display:flex;align-items:center;gap:12px;">
-    <p><strong>ROSnet CRM review</strong> — <span id="comment-counter">0 comments</span></p>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <input class="name-input" placeholder="Your name..." oninput="setReviewerName(this.value)" title="Enter your name — it will appear on all comments">
-    <button class="export-btn" onclick="exportComments()">⬇ Export comments</button>
-  </div>
-</div>
+</section>
 
 <script>
-// ── COMMENT SYSTEM ──
-const REVIEWER_NAME_KEY = 'rosnet_reviewer_name';
-
-function getReviewerName() {
-  return localStorage.getItem(REVIEWER_NAME_KEY) || '';
+function showArea(id, btn) {
+  document.querySelectorAll('.area-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.area-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('area-' + id).classList.add('active');
+  btn.classList.add('active');
 }
-
-function setReviewerName(name) {
-  localStorage.setItem(REVIEWER_NAME_KEY, name);
-  document.querySelectorAll('.name-input').forEach(i => i.value = name);
-}
-
-function getComments(zoneId) {
-  try { return JSON.parse(localStorage.getItem('comments_' + zoneId) || '[]'); } catch { return []; }
-}
-
-function saveComment(zoneId, text) {
-  const name = getReviewerName() || 'Reviewer';
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
-  const comments = getComments(zoneId);
-  comments.push({ name, date: dateStr, text });
-  localStorage.setItem('comments_' + zoneId, JSON.stringify(comments));
-  renderComments(zoneId);
-  updateExportBar();
-}
-
-function deleteComment(zoneId, idx) {
-  const comments = getComments(zoneId);
-  comments.splice(idx, 1);
-  localStorage.setItem('comments_' + zoneId, JSON.stringify(comments));
-  renderComments(zoneId);
-  updateExportBar();
-}
-
-function renderComments(zoneId) {
-  const list = document.getElementById('clist_' + zoneId);
-  if (!list) return;
-  const comments = getComments(zoneId);
-  if (comments.length === 0) { list.innerHTML = ''; return; }
-  list.innerHTML = comments.map((c, i) => `
-    <div class="comment-item">
-      <p class="comment-meta">${c.name} · ${c.date} <span onclick="deleteComment('${zoneId}',${i})" style="float:right;cursor:pointer;opacity:0.4;font-size:11px;">✕ remove</span></p>
-      <p class="comment-text">${c.text.replace(/\n/g,'<br>')}</p>
-    </div>`).join('');
-}
-
-function submitComment(zoneId) {
-  const ta = document.getElementById('cta_' + zoneId);
-  const text = ta.value.trim();
-  if (!text) return;
-  saveComment(zoneId, text);
-  ta.value = '';
-}
-
-function updateExportBar() {
-  let total = 0;
-  document.querySelectorAll('[id^="clist_"]').forEach(el => {
-    const zoneId = el.id.replace('clist_','');
-    total += getComments(zoneId).length;
-  });
-  const counter = document.getElementById('comment-counter');
-  if (counter) counter.textContent = total + ' comment' + (total !== 1 ? 's' : '');
-}
-
-function exportComments() {
-  const name = getReviewerName() || 'Reviewer';
-  const date = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
-  let out = `ROSnet CRM — Review comments\nReviewer: ${name}\nExported: ${date}\n${'='.repeat(60)}\n\n`;
-  let total = 0;
-  document.querySelectorAll('[id^="clist_"]').forEach(el => {
-    const zoneId = el.id.replace('clist_','');
-    const comments = getComments(zoneId);
-    if (comments.length === 0) return;
-    const label = document.getElementById('clabel_' + zoneId);
-    out += `\n── ${label ? label.textContent : zoneId} ──\n`;
-    comments.forEach((c, i) => {
-      out += `\n[${i+1}] ${c.name} · ${c.date}\n${c.text}\n`;
-      total++;
-    });
-  });
-  if (total === 0) { alert('No comments yet.'); return; }
-  out += `\n${'='.repeat(60)}\nTotal: ${total} comment${total !== 1 ? 's' : ''}`;
-  const blob = new Blob([out], {type:'text/plain'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'rosnet_review_comments.txt';
-  a.click();
-}
-
-function buildCommentZone(zoneId, label) {
-  return `
-  <div class="comment-zone">
-    <p class="comment-zone-title" id="clabel_${zoneId}">${label}</p>
-    <div class="comment-list" id="clist_${zoneId}"></div>
-    <div class="comment-input-row">
-      <textarea class="comment-input" id="cta_${zoneId}" placeholder="Add a comment on this section..." rows="2" onkeydown="if(event.key==='Enter'&&event.ctrlKey){submitComment('${zoneId}')}"></textarea>
-      <button class="comment-btn" onclick="submitComment('${zoneId}')">Add</button>
-    </div>
-  </div>`;
-}
-
-// init on load
-window.addEventListener('DOMContentLoaded', () => {
-  // inject comment zones after each major section
-  const zones = [
-    { id:'billing_new_client',    label:'Finance — New client setup' },
-    { id:'billing_first',         label:'Finance — First billing' },
-    { id:'billing_loc_open',      label:'Finance — Location opens' },
-    { id:'billing_loc_close',     label:'Finance — Location closes' },
-    { id:'billing_monthly',       label:'Finance — Monthly cycle' },
-    { id:'sales_pipeline',        label:'Sales — Pipeline stages' },
-    { id:'sales_daily',           label:'Sales — Daily workflow' },
-    { id:'sales_tools',           label:'Sales — Tools & systems' },
-    { id:'sales_gaps',            label:'Sales — Gaps today' },
-    { id:'crm_handoff',           label:'CS/CRM — Sales to CS handoff' },
-    { id:'crm_account',           label:'CS/CRM — Account management' },
-    { id:'crm_tools',             label:'CS/CRM — Tools & systems' },
-    { id:'crm_gaps',              label:'CS/CRM — Gaps today' },
-    { id:'hier_h1',               label:'Hierarchy — Holding Group' },
-    { id:'hier_h2',               label:'Hierarchy — Operating Company' },
-    { id:'hier_h3',               label:'Hierarchy — Billing Sub-Entity' },
-    { id:'hier_h4',               label:'Hierarchy — Site' },
-    { id:'hier_h5',               label:'Hierarchy — Location' },
-    { id:'dec_critical',          label:'Decisions — Critical' },
-    { id:'dec_high',              label:'Decisions — High priority' },
-    { id:'dec_medium',            label:'Decisions — Medium priority' },
-  ];
-
-  // inject into tab panels and detail sections
-  const panelMap = {
-    'billing_new_client': 'tab-new-client',
-    'billing_first':      'tab-first-billing',
-    'billing_loc_open':   'tab-loc-open',
-    'billing_loc_close':  'tab-loc-close',
-    'billing_monthly':    'tab-monthly',
-    'sales_pipeline':     'sales-pipeline',
-    'sales_daily':        'sales-daily',
-    'sales_tools':        'sales-tools',
-    'sales_gaps':         'sales-gaps',
-    'crm_handoff':        'crm-handoff',
-    'crm_account':        'crm-account',
-    'crm_tools':          'crm-tools',
-    'crm_gaps':           'crm-gaps',
-  };
-
-  zones.forEach(z => {
-    const panelId = panelMap[z.id];
-    if (panelId) {
-      const panel = document.getElementById(panelId);
-      if (panel) {
-        const div = document.createElement('div');
-        div.innerHTML = buildCommentZone(z.id, z.label);
-        panel.appendChild(div.firstElementChild);
-        renderComments(z.id);
-      }
-    }
-  });
-
-  // hierarchy detail panels
-  const hierMap = { 'hier_h1':'h1','hier_h2':'h2','hier_h3':'h3','hier_h4':'h4','hier_h5':'h5' };
-  Object.entries(hierMap).forEach(([zId, hId]) => {
-    const panel = document.getElementById(hId);
-    if (panel) {
-      const zone = zones.find(z => z.id === zId);
-      const div = document.createElement('div');
-      div.innerHTML = buildCommentZone(zId, zone.label);
-      panel.appendChild(div.firstElementChild);
-      renderComments(zId);
-    }
-  });
-
-  // decisions — inject after each group
-  const decGroups = [
-    { id:'dec_critical', selector:'.dec-group-title:nth-of-type(1)' },
-  ];
-
-  // simpler: inject one comment zone after each dec-group-title
-  const decTitles = document.querySelectorAll('.dec-group-title');
-  const decIds = ['dec_critical','dec_high','dec_medium'];
-  const decLabels = ['Decisions — Critical blockers','Decisions — High priority','Decisions — Medium priority'];
-
-  decTitles.forEach((title, i) => {
-    if (!decIds[i]) return;
-    // collect all cards until next title
-    const container = document.createElement('div');
-    container.innerHTML = buildCommentZone(decIds[i], decLabels[i]);
-    // insert after last dec-card in this group
-    let node = title.nextElementSibling;
-    let lastCard = null;
-    while (node && !node.classList.contains('dec-group-title')) {
-      if (node.classList && node.classList.contains('dec-card')) lastCard = node;
-      node = node.nextElementSibling;
-    }
-    if (lastCard) lastCard.after(container.firstElementChild);
-    renderComments(decIds[i]);
-  });
-
-  // restore reviewer name
-  const savedName = getReviewerName();
-  document.querySelectorAll('.name-input').forEach(i => i.value = savedName);
-
-  updateExportBar();
-});
 </script>
+
 </body>
 </html>
