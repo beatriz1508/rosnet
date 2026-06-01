@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stayce — Billing Process</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f4f0;
+    --bg3: #eceae3;
+    --text: #1a1a18;
+    --text2: #5f5e5a;
+    --text3: #8a8880;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --teal-fill: #e1f5ee;
+    --teal-stroke: #0f6e56;
+    --teal-text: #085041;
+    --amber-fill: #faeeda;
+    --amber-stroke: #ba7517;
+    --amber-text: #633806;
+    --gray-fill: #f1efe8;
+    --gray-stroke: #5f5e5a;
+    --gray-text: #2c2c2a;
+    --red-fill: #fcebeb;
+    --red-stroke: #a32d2d;
+    --red-text: #791f1f;
+    --green-fill: #eaf3de;
+    --green-stroke: #3b6d11;
+    --green-text: #27500a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Georgia', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px;
+  }
+  header {
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    margin-bottom: 4px;
+  }
+  header p {
+    font-size: 14px;
+    color: var(--text2);
+    font-style: italic;
+  }
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text2);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  svg { display: block; width: 100%; height: auto; }
+  .gap-box {
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: var(--red-fill);
+    border: 1px solid var(--red-stroke);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .gap-box strong { color: var(--red-stroke); display: block; margin-bottom: 4px; font-size: 14px; }
+  .gap-box p { color: var(--red-text); margin-bottom: 2px; }
+  .good-box {
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: var(--green-fill);
+    border: 1px solid var(--green-stroke);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .good-box strong { color: var(--green-stroke); display: block; margin-bottom: 4px; font-size: 14px; }
+  .good-box p { color: var(--green-text); }
+  .amber-box {
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: var(--amber-fill);
+    border: 1px solid var(--amber-stroke);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .amber-box strong { color: var(--amber-stroke); display: block; margin-bottom: 4px; font-size: 14px; }
+  .amber-box p { color: var(--amber-text); }
+</style>
+
+<style>
+/* ── COMMENT SYSTEM ── */
+.comment-zone { margin-top: 16px; border-top: 1px solid #eceae3; padding-top: 14px; }
+.comment-zone-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #8a8880; font-family: Georgia, serif; margin: 0 0 10px; }
+.comment-list { margin-bottom: 10px; }
+.comment-item { background: #fffbf0; border: 1px solid #faeeda; border-radius: 6px; padding: 10px 12px; margin-bottom: 6px; font-family: Georgia, serif; }
+.comment-meta { font-size: 11px; color: #854f0b; margin: 0 0 4px; font-weight: 500; }
+.comment-text { font-size: 13px; color: #1a1a18; margin: 0; line-height: 1.5; }
+.comment-input-row { display: flex; gap: 8px; align-items: flex-start; }
+.comment-input { flex: 1; padding: 8px 10px; font-size: 13px; font-family: Georgia, serif; border: 1px solid #d3d1c7; border-radius: 6px; background: #fafaf8; color: #1a1a18; resize: vertical; min-height: 36px; }
+.comment-input:focus { outline: none; border-color: #5f5e5a; }
+.comment-btn { padding: 8px 14px; font-size: 12px; font-family: Georgia, serif; font-weight: 500; background: #1a1a18; color: #fff; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+.comment-btn:hover { background: #444441; }
+.comment-btn.secondary { background: none; color: #5f5e5a; border: 1px solid #d3d1c7; }
+.comment-btn.secondary:hover { background: #f1efe8; }
+
+/* sticky export bar */
+.export-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #1a1a18; color: #fff;
+  padding: 12px 32px; display: flex; align-items: center; justify-content: space-between;
+  font-family: Georgia, serif; z-index: 1000;
+}
+.export-bar p { margin: 0; font-size: 13px; color: #b4b2a9; }
+.export-bar strong { color: #fff; }
+.export-btn { padding: 8px 20px; font-size: 13px; font-family: Georgia, serif; font-weight: 500; background: #faeeda; color: #633806; border: none; border-radius: 6px; cursor: pointer; }
+.export-btn:hover { background: #fac775; }
+.name-input { padding: 6px 10px; font-size: 13px; font-family: Georgia, serif; border: none; border-radius: 6px; background: #2c2c2a; color: #fff; width: 180px; }
+.name-input::placeholder { color: #5f5e5a; }
+body { padding-bottom: 64px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Stayce Holcomb — Billing Process</h1>
+  <p>Finance · Maxio · Intranet · 10yr tenure — step-by-step operational flows</p>
+</header>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('new-client',this)">New client</button>
+  <button class="tab-btn" onclick="showTab('first-billing',this)">First billing</button>
+  <button class="tab-btn" onclick="showTab('loc-open',this)">Location opens</button>
+  <button class="tab-btn" onclick="showTab('loc-close',this)">Location closes</button>
+  <button class="tab-btn" onclick="showTab('monthly',this)">Monthly cycle</button>
+</div>
+
+<!-- ── NEW CLIENT ── -->
+<div id="tab-new-client" class="tab-panel active">
+<svg viewBox="0 0 680 680">
+<defs>
+  <marker id="arr1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="arr-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#0f6e56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- Column headers -->
+<rect x="20" y="10" width="180" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="110" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Email / PandaDoc</text>
+<rect x="220" y="10" width="200" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="320" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Intranet — Implementation Tracker</text>
+<rect x="440" y="10" width="220" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="550" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Maxio</text>
+
+<!-- Step 1: receive contract -->
+<rect x="20" y="48" width="180" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="110" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Receive signed contract</text>
+<text x="110" y="82" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Stayce copied on agreement email</text>
+
+<line x1="110" y1="92" x2="110" y2="118" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr1)"/>
+<text x="126" y="110" font-size="10" fill="#8a8880" font-family="Georgia,serif">manual</text>
+
+<!-- Arrow to tracker -->
+<line x1="200" y1="70" x2="218" y2="140" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr1)"/>
+
+<!-- Step 2: impl tracker -->
+<rect x="220" y="118" width="200" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="320" y="136" text-anchor="middle" font-size="13" font-weight="500" fill="#633806" font-family="Georgia,serif">Add to Implementation Tracker</text>
+<text x="320" y="152" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Client name · products signed</text>
+<text x="320" y="165" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Impl. fee invoice number</text>
+
+<line x1="320" y1="174" x2="320" y2="200" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="320" y1="200" x2="550" y2="200" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr1)"/>
+<text x="430" y="194" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">manual</text>
+
+<!-- Step 3: create in Maxio -->
+<rect x="440" y="210" width="220" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="550" y="228" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Create customer in Maxio</text>
+<text x="550" y="244" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Billing entity + email address</text>
+
+<line x1="550" y1="254" x2="550" y2="282" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr1)"/>
+
+<!-- Decision -->
+<polygon points="550,282 592,304 550,326 508,304" fill="white" stroke="#5f5e5a" stroke-width="1"/>
+<text x="550" y="300" text-anchor="middle" font-size="10" fill="#2c2c2a" font-family="Georgia,serif">Billing</text>
+<text x="550" y="312" text-anchor="middle" font-size="10" fill="#2c2c2a" font-family="Georgia,serif">structure?</text>
+
+<!-- Consolidated -->
+<line x1="508" y1="304" x2="430" y2="304" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr1)"/>
+<text x="468" y="296" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">consolidated</text>
+<rect x="240" y="282" width="188" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="334" y="300" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">1 customer record</text>
+<text x="334" y="316" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">N subscriptions — 1 per site</text>
+<text x="334" y="330" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">1 invoice destination</text>
+
+<!-- Split -->
+<line x1="550" y1="326" x2="550" y2="352" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr1)"/>
+<text x="566" y="342" font-size="10" fill="#8a8880" font-family="Georgia,serif">split</text>
+<rect x="440" y="352" width="220" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="550" y="370" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">N customer records</text>
+<text x="550" y="386" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">1 per billing entity / bank account</text>
+<text x="550" y="399" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">e.g. IHOP New York</text>
+
+<!-- Merge -->
+<line x1="334" y1="338" x2="334" y2="430" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="550" y1="408" x2="550" y2="430" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="334" y1="430" x2="550" y2="430" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="442" y1="430" x2="442" y2="450" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr1)"/>
+
+<!-- Step 4: add subscriptions -->
+<rect x="342" y="450" width="200" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="442" y="468" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Add subscriptions + components</text>
+<text x="442" y="484" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">1 subscription per site / concept</text>
+<text x="442" y="497" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Components = active products</text>
+
+<line x1="442" y1="506" x2="442" y2="530" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr1)"/>
+
+<!-- End: not billed yet -->
+<rect x="282" y="530" width="320" height="56" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="442" y="548" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Client in Maxio — not yet billed</text>
+<text x="442" y="564" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Waiting for Implementation Team confirmation</text>
+<text x="442" y="577" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Client must pay implementation fee first</text>
+
+</svg>
+<div class="gap-box">
+  <strong>4 fully manual steps — every new client</strong>
+  <p>Signed agreement → Implementation Tracker → Maxio customer → subscriptions per site. Each step is a point of failure: misspellings, missed steps, delays.</p>
+  <p>No automation, no validation, no integration. site_id not at customer level in Maxio — blocks any future sync.</p>
+</div>
+</div>
+
+<!-- ── FIRST BILLING ── -->
+<div id="tab-first-billing" class="tab-panel">
+<svg viewBox="0 0 680 380">
+<defs>
+  <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<rect x="20" y="10" width="160" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="100" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Implementation Team</text>
+<rect x="460" y="10" width="200" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="560" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Maxio</text>
+
+<rect x="200" y="48" width="280" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="340" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">End of month trigger</text>
+<text x="340" y="82" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Stayce contacts Implementation Team</text>
+
+<line x1="340" y1="92" x2="340" y2="110" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="340" y1="110" x2="100" y2="110" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr2)"/>
+
+<rect x="20" y="120" width="160" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="100" y="138" text-anchor="middle" font-size="13" font-weight="500" fill="#633806" font-family="Georgia,serif">Impl. Team confirms</text>
+<text x="100" y="154" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Who is ready to bill</text>
+<text x="100" y="167" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">"Rose Max LLC is ready"</text>
+
+<line x1="180" y1="148" x2="340" y2="148" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr2)"/>
+<text x="258" y="140" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">confirmation</text>
+
+<line x1="340" y1="148" x2="458" y2="148" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr2)"/>
+<text x="400" y="140" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">manual</text>
+
+<rect x="460" y="120" width="200" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="560" y="138" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Activate in Maxio</text>
+<text x="560" y="154" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Add to billing cycle manually</text>
+<text x="560" y="167" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Set billing start date</text>
+
+<line x1="560" y1="176" x2="560" y2="204" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr2)"/>
+
+<rect x="360" y="204" width="300" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="510" y="222" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Auto-billing activated</text>
+<text x="510" y="238" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Maxio bills on 1st of every month</text>
+<text x="510" y="251" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Monthly · quarterly · annual exceptions</text>
+
+<line x1="510" y1="260" x2="510" y2="288" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr2)"/>
+
+<rect x="360" y="288" width="300" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="510" y="306" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Invoices sent automatically</text>
+<text x="510" y="322" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">All active clients · 1st of each month</text>
+
+</svg>
+<div class="amber-box">
+  <strong>Once activated: fully automatic</strong>
+  <p>The only recurring manual step is the monthly confirmation with the Implementation Team to add new clients to the billing cycle. All existing clients bill automatically from Maxio.</p>
+  <p>This confirmation should be triggered automatically when a deal reaches Closed Won in HubSpot.</p>
+</div>
+</div>
+
+<!-- ── LOCATION OPENS ── -->
+<div id="tab-loc-open" class="tab-panel">
+<svg viewBox="0 0 680 480">
+<defs>
+  <marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<rect x="20" y="10" width="120" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="80" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Client / Product</text>
+<rect x="160" y="10" width="120" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="220" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">System alerts</text>
+<rect x="300" y="10" width="160" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="380" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Intranet billing file</text>
+<rect x="480" y="10" width="180" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="570" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Maxio</text>
+
+<rect x="20" y="48" width="120" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="80" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Client fills</text>
+<text x="80" y="82" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">New location form</text>
+
+<line x1="140" y1="70" x2="158" y2="70" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr3)"/>
+
+<rect x="160" y="48" width="120" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="220" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#633806" font-family="Georgia,serif">Alert 1</text>
+<text x="220" y="82" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">"Client X adding</text>
+<text x="220" y="95" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">location Y — est. date Z"</text>
+
+<line x1="220" y1="104" x2="220" y2="132" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr3)"/>
+
+<rect x="160" y="132" width="120" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="220" y="150" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Stayce waits</text>
+<text x="220" y="166" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">No action yet</text>
+
+<line x1="220" y1="176" x2="220" y2="208" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr3)"/>
+
+<rect x="160" y="208" width="120" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="220" y="226" text-anchor="middle" font-size="13" font-weight="500" fill="#633806" font-family="Georgia,serif">Alert 2</text>
+<text x="220" y="242" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">First sales transmission</text>
+<text x="220" y="255" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">"Location Y ready to bill"</text>
+
+<line x1="280" y1="236" x2="298" y2="236" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr3)"/>
+<line x1="280" y1="248" x2="478" y2="248" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr3)"/>
+
+<rect x="300" y="208" width="160" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="380" y="226" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Update billing file</text>
+<text x="380" y="242" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Add billing entity name</text>
+<text x="380" y="255" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Intranet database</text>
+
+<rect x="480" y="208" width="180" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="570" y="226" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Update Maxio</text>
+<text x="570" y="242" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Quantity +1 per module</text>
+<text x="570" y="255" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Labor · API · Power Center</text>
+
+<line x1="570" y1="264" x2="570" y2="292" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr3)"/>
+
+<rect x="420" y="292" width="240" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="540" y="310" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">New location billed</text>
+<text x="540" y="326" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">From next 1st of month</text>
+
+</svg>
+<div class="gap-box">
+  <strong>Two alerts · two manual updates · per module</strong>
+  <p>If the client has Labor, API, and Power Center — that is 3 separate quantity updates in Maxio for every new location.</p>
+  <p>For a client with 5 modules opening 3 new stores: 15 manual updates. Maxio API could automate all of this with a single event trigger.</p>
+</div>
+</div>
+
+<!-- ── LOCATION CLOSES ── -->
+<div id="tab-loc-close" class="tab-panel">
+<svg viewBox="0 0 680 400">
+<defs>
+  <marker id="arr4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<rect x="20" y="10" width="120" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="80" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">System</text>
+<rect x="160" y="10" width="120" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="220" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Stayce</text>
+<rect x="300" y="10" width="160" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="380" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Intranet billing file</text>
+<rect x="480" y="10" width="180" height="20" rx="4" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="570" y="24" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Maxio</text>
+
+<rect x="20" y="48" width="120" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="80" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#633806" font-family="Georgia,serif">Whole-office alert</text>
+<text x="80" y="82" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">"Location X · close</text>
+<text x="80" y="95" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">date Y"</text>
+
+<line x1="140" y1="76" x2="158" y2="76" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr4)"/>
+
+<rect x="160" y="48" width="120" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="220" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Stayce receives</text>
+<text x="220" y="82" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Goes to billing file</text>
+
+<line x1="280" y1="70" x2="298" y2="120" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr4)"/>
+<line x1="280" y1="80" x2="480" y2="120" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr4)"/>
+
+<rect x="300" y="120" width="160" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="380" y="138" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Update billing file</text>
+<text x="380" y="154" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Billing override field</text>
+<text x="380" y="167" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">→ "closed"</text>
+
+<rect x="480" y="120" width="180" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="570" y="138" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Update Maxio</text>
+<text x="570" y="154" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Quantity -1 per module</text>
+<text x="570" y="167" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Labor · API · Power Center</text>
+
+<line x1="380" y1="176" x2="380" y2="230" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="570" y1="176" x2="570" y2="230" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="380" y1="230" x2="570" y2="230" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="475" y1="230" x2="475" y2="250" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr4)"/>
+
+<rect x="325" y="250" width="300" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="475" y="268" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Location no longer billed</text>
+<text x="475" y="284" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">From next 1st of month</text>
+
+</svg>
+<div class="gap-box">
+  <strong>One close alert · multiple manual updates</strong>
+  <p>Stayce must update each product module separately in Maxio. If the client has 3 modules — 3 separate quantity changes per location closure.</p>
+  <p>Target: close alert → Maxio API → all modules updated in one automated call.</p>
+</div>
+</div>
+
+<!-- ── MONTHLY CYCLE ── -->
+<div id="tab-monthly" class="tab-panel">
+<svg viewBox="0 0 680 360">
+<defs>
+  <marker id="arr5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<rect x="200" y="20" width="280" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="340" y="38" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">1st of the month</text>
+<text x="340" y="54" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Maxio billing runs automatically</text>
+
+<line x1="340" y1="64" x2="340" y2="90" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr5)"/>
+
+<polygon points="340,90 385,112 340,134 295,112" fill="white" stroke="#5f5e5a" stroke-width="1"/>
+<text x="340" y="107" text-anchor="middle" font-size="10" fill="#2c2c2a" font-family="Georgia,serif">Billing freq?</text>
+<text x="340" y="119" text-anchor="middle" font-size="10" fill="#2c2c2a" font-family="Georgia,serif"></text>
+
+<line x1="340" y1="134" x2="340" y2="160" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr5)"/>
+<text x="356" y="150" font-size="10" fill="#8a8880" font-family="Georgia,serif">monthly</text>
+
+<line x1="295" y1="112" x2="160" y2="112" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr5)"/>
+<text x="224" y="104" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">quarterly</text>
+
+<line x1="385" y1="112" x2="520" y2="112" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr5)"/>
+<text x="452" y="104" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">annual</text>
+
+<rect x="240" y="160" width="200" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="340" y="178" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Invoice sent automatically</text>
+<text x="340" y="194" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">All active clients</text>
+
+<rect x="60" y="88" width="170" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="145" y="106" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Invoice every 3 months</text>
+<text x="145" y="122" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Handful of clients</text>
+
+<rect x="450" y="88" width="180" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="540" y="106" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Invoice once a year</text>
+<text x="540" y="122" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Couple of exceptions</text>
+
+<line x1="145" y1="132" x2="145" y2="232" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="340" y1="204" x2="340" y2="232" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="540" y1="132" x2="540" y2="232" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="145" y1="232" x2="540" y2="232" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="342" y1="232" x2="342" y2="252" stroke="#5f5e5a" stroke-width="1" marker-end="url(#arr5)"/>
+
+<rect x="152" y="252" width="380" height="56" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="342" y="270" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Stayce's only monthly task</text>
+<text x="342" y="286" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Confirm new clients with Impl. Team</text>
+<text x="342" y="299" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Manually add them to Maxio billing cycle</text>
+
+</svg>
+<div class="good-box">
+  <strong>Once activated: fully automatic</strong>
+  <p>All existing clients bill automatically on the 1st. Stayce's only recurring manual work is confirming new clients each month with the Implementation Team.</p>
+  <p>This monthly confirmation should be triggered automatically by Closed Won in HubSpot — eliminating the last manual step.</p>
+</div>
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SALES PROCESS SECTION
+════════════════════════════════════════════════════════════════ -->
+<hr style="margin: 48px 0 40px; border: none; border-top: 1px solid #eceae3;">
+
+<div style="margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #eceae3;">
+  <h2 style="font-size: 22px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 4px; font-family: Georgia, serif;">Sales process — how it works today</h2>
+  <p style="font-size: 14px; color: #5f5e5a; font-style: italic; font-family: Georgia, serif;">Consolidated from discovery sessions with the sales team · May 2026</p>
+</div>
+
+<!-- Sales tabs -->
+<div class="tab-nav" id="sales-nav">
+  <button class="tab-btn s-active" onclick="showSales('pipeline',this)">Pipeline stages</button>
+  <button class="tab-btn" onclick="showSales('daily',this)">Daily workflow</button>
+  <button class="tab-btn" onclick="showSales('tools',this)">Tools & systems</button>
+  <button class="tab-btn" onclick="showSales('gaps',this)">Gaps today</button>
+</div>
+
+<style>
+.tab-btn.s-active { color: #1a1a18; border-bottom-color: #1a1a18; }
+</style>
+
+<!-- ── PIPELINE STAGES ── -->
+<div id="sales-pipeline" class="sales-panel" style="display:block;">
+<svg viewBox="0 0 680 560" style="display:block;width:100%;height:auto;">
+<defs>
+  <marker id="sarr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- Contacts (pre-pipeline) -->
+<rect x="20" y="20" width="140" height="64" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="90" y="40" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Contacts only</text>
+<text x="90" y="56" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Met at conference</text>
+<text x="90" y="70" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">No email reply yet</text>
+
+<!-- Arrow to pipeline -->
+<line x1="160" y1="52" x2="186" y2="52" stroke="#5f5e5a" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#sarr)"/>
+<text x="172" y="44" text-anchor="middle" font-size="9" fill="#8a8880" font-family="Georgia,serif">buying signal</text>
+
+<!-- Stage 1: Discovery -->
+<rect x="188" y="20" width="140" height="64" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
+<text x="258" y="38" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Discovery</text>
+<text x="258" y="52" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">First demo booked</text>
+<text x="258" y="64" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Understand the group</text>
+<text x="258" y="76" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Confirm fit</text>
+<line x1="328" y1="52" x2="354" y2="52" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
+
+<!-- Stage 2: Solution Fit -->
+<rect x="356" y="20" width="140" height="64" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
+<text x="426" y="38" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Solution Fit</text>
+<text x="426" y="52" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Follow-up demos</text>
+<text x="426" y="64" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Deeper dive into modules</text>
+<text x="426" y="76" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Custom tailor the pitch</text>
+<line x1="496" y1="52" x2="522" y2="52" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
+
+<!-- Stage 3: Proposal -->
+<rect x="524" y="20" width="140" height="64" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
+<text x="594" y="38" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Proposal</text>
+<text x="594" y="52" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Pricing sent by email</text>
+<text x="594" y="64" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Prospect reviews</text>
+<text x="594" y="76" text-anchor="middle" font-size="10" fill="#0f6e56" font-family="Georgia,serif">Discussion / negotiation</text>
+
+<!-- Second row -->
+<line x1="594" y1="84" x2="594" y2="110" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="594" y1="110" x2="426" y2="110" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
+
+<!-- Stage 4: Agreements -->
+<rect x="356" y="120" width="140" height="64" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="1"/>
+<text x="426" y="138" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Agreements</text>
+<text x="426" y="152" text-anchor="middle" font-size="10" fill="#854f0b" font-family="Georgia,serif">PandaDoc sent</text>
+<text x="426" y="164" text-anchor="middle" font-size="10" fill="#854f0b" font-family="Georgia,serif">Terms agreed · waiting for</text>
+<text x="426" y="176" text-anchor="middle" font-size="10" fill="#854f0b" font-family="Georgia,serif">signature</text>
+<line x1="356" y1="152" x2="330" y2="152" stroke="#5f5e5a" stroke-width="1" marker-end="url(#sarr)"/>
+
+<!-- Stage 5: Closed Won -->
+<rect x="188" y="120" width="140" height="64" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/>
+<text x="258" y="138" text-anchor="middle" font-size="12" font-weight="500" fill="#27500a" font-family="Georgia,serif">Closed Won</text>
+<text x="258" y="152" text-anchor="middle" font-size="10" fill="#3b6d11" font-family="Georgia,serif">Contract signed</text>
+<text x="258" y="164" text-anchor="middle" font-size="10" fill="#3b6d11" font-family="Georgia,serif">Company name validated</text>
+<text x="258" y="176" text-anchor="middle" font-size="10" fill="#3b6d11" font-family="Georgia,serif">Handoff to CS</text>
+
+<!-- Closed Lost -->
+<line x1="426" y1="184" x2="426" y2="214" stroke="#5f5e5a" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#sarr)"/>
+<rect x="356" y="214" width="140" height="56" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="426" y="234" text-anchor="middle" font-size="12" font-weight="500" fill="#791f1f" font-family="Georgia,serif">Closed Lost</text>
+<text x="426" y="250" text-anchor="middle" font-size="10" fill="#a32d2d" font-family="Georgia,serif">Definitive no · door closed</text>
+<text x="426" y="262" text-anchor="middle" font-size="10" fill="#a32d2d" font-family="Georgia,serif">Revisit in years</text>
+
+<!-- Entry criteria callout -->
+<rect x="20" y="130" width="155" height="170" rx="8" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="97" y="152" text-anchor="middle" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Deal creation rule</text>
+<text x="97" y="170" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">A deal is created only</text>
+<text x="97" y="184" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">when there is a formal</text>
+<text x="97" y="198" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">discussion + expressed</text>
+<text x="97" y="212" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">interest. Not after a</text>
+<text x="97" y="226" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">conference intro or</text>
+<text x="97" y="240" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">unanswered email.</text>
+<text x="97" y="258" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif" font-style="italic">Buying signal required.</text>
+<text x="97" y="292" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Deal type: New Business</text>
+<text x="97" y="306" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">or Expansion</text>
+
+<!-- Note: Closed Ghosted deleted -->
+<rect x="20" y="360" width="640" height="76" rx="8" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="340" y="382" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">Historical gap: "Closed Ghosted" stage was deleted</text>
+<text x="340" y="400" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">There was a dedicated stage for prospects who went silent — never said no, just stopped responding. This was deleted and merged</text>
+<text x="340" y="416" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">into Closed Lost, making it impossible to distinguish lost deals from ghosted ones. This list was prime re-engagement material.</text>
+
+<!-- Note: rename Negotiation -->
+<rect x="20" y="456" width="640" height="56" rx="8" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="340" y="476" text-anchor="middle" font-size="13" font-weight="500" fill="#ba7517" font-family="Georgia,serif">Proposed rename: Negotiation → Agreements</text>
+<text x="340" y="494" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">"Negotiation" is a misnomer — by the time PandaDoc is sent, terms are already agreed. The stage is about waiting for signature. "Agreements" is more accurate.</text>
+
+</svg>
+</div>
+
+<!-- ── DAILY WORKFLOW ── -->
+<div id="sales-daily" class="sales-panel" style="display:none;">
+<svg viewBox="0 0 680 560" style="display:block;width:100%;height:auto;">
+<defs>
+  <marker id="darr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- Inbound flow -->
+<rect x="20" y="20" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="32" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">INBOUND — prospect fills interest form on rosnet.com</text>
+
+<rect x="440" y="48" width="200" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="540" y="66" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Contact auto-created</text>
+<text x="540" y="82" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Email alert to sales team</text>
+
+<line x1="440" y1="70" x2="280" y2="70" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+<text x="358" y="62" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">manual decision: who takes it?</text>
+
+<!-- Outbound flow -->
+<rect x="20" y="110" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="122" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">OUTBOUND — rep works through account queue</text>
+
+<rect x="20" y="138" width="200" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="120" y="156" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Rep opens HubSpot</text>
+<text x="120" y="172" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Reviews task list + pipeline</text>
+
+<line x1="220" y1="160" x2="246" y2="160" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+
+<rect x="248" y="138" width="180" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="338" y="156" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Searches for company</text>
+<text x="338" y="172" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Verifies contact is correct</text>
+
+<line x1="428" y1="160" x2="454" y2="160" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+
+<rect x="456" y="138" width="200" height="44" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="556" y="156" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Executes outreach</text>
+<text x="556" y="172" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Call · email · LinkedIn</text>
+
+<!-- Two outcomes -->
+<line x1="556" y1="182" x2="556" y2="210" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+
+<rect x="20" y="226" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="238" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">RESPONSE OR NOT?</text>
+
+<line x1="556" y1="242" x2="556" y2="260" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="200" y1="260" x2="556" y2="260" stroke="#5f5e5a" stroke-width="1"/>
+<line x1="200" y1="260" x2="200" y2="278" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+<line x1="556" y1="260" x2="556" y2="278" stroke="#5f5e5a" stroke-width="1" marker-end="url(#darr)"/>
+<text x="140" y="256" font-size="10" fill="#8a8880" font-family="Georgia,serif">responded</text>
+<text x="560" y="256" font-size="10" fill="#8a8880" font-family="Georgia,serif">no response</text>
+
+<rect x="20" y="278" width="360" height="56" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+<text x="200" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#27500a" font-family="Georgia,serif">Advance in pipeline</text>
+<text x="200" y="312" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Log activity on Company record</text>
+<text x="200" y="326" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Update deal stage + next steps</text>
+
+<rect x="440" y="278" width="220" height="56" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="550" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Continue outreach</text>
+<text x="550" y="312" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Set follow-up task</text>
+<text x="550" y="326" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Move to Nurture if no signal</text>
+
+<!-- Call logging -->
+<rect x="20" y="360" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="372" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">ACTIVITY LOGGING — how calls and emails are tracked today</text>
+
+<rect x="20" y="386" width="190" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="115" y="404" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Calls logged in HubSpot</text>
+<text x="115" y="420" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Via HubSpot call feature</text>
+<text x="115" y="434" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Tracked by dial count</text>
+
+<rect x="226" y="386" width="196" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="324" y="404" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Meetings via Fireflies</text>
+<text x="324" y="420" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Auto-joins Teams calls</text>
+<text x="324" y="434" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Sometimes must be invited manually</text>
+
+<rect x="438" y="386" width="202" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="539" y="404" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Emails via HubSpot</text>
+<text x="539" y="420" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Sent from HubSpot directly</text>
+<text x="539" y="434" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Or replied from Outlook (synced)</text>
+
+<!-- Task management -->
+<rect x="20" y="460" width="640" height="56" rx="6" fill="#eededfe" stroke="#534ab7" stroke-width="0.5" fill-opacity="0.3"/>
+<text x="340" y="480" text-anchor="middle" font-size="13" font-weight="500" fill="#26215c" font-family="Georgia,serif">Task management — how reps stay organized</text>
+<text x="340" y="498" text-anchor="middle" font-size="11" fill="#3c3489" font-family="Georgia,serif">Tasks are set on contacts and companies inside HubSpot. Every morning, follow-up tasks surface. Rep works through the list — call, email, LinkedIn.</text>
+
+</svg>
+</div>
+
+<!-- ── TOOLS & SYSTEMS ── -->
+<div id="sales-tools" class="sales-panel" style="display:none;">
+<svg viewBox="0 0 680 440" style="display:block;width:100%;height:auto;">
+
+<!-- HubSpot -->
+<rect x="20" y="20" width="190" height="180" rx="8" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
+<text x="115" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#085041" font-family="Georgia,serif">HubSpot</text>
+<text x="115" y="62" text-anchor="middle" font-size="11" fill="#085041" font-family="Georgia,serif">Primary sales tool</text>
+<text x="40" y="84" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Pipeline management</text>
+<text x="40" y="100" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Contact + company records</text>
+<text x="40" y="116" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Email logging + call tracking</text>
+<text x="40" y="132" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Task management</text>
+<text x="40" y="148" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Deal stages + forecast</text>
+<text x="40" y="164" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Calendar sync (Outlook)</text>
+<text x="40" y="180" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Fireflies transcripts</text>
+
+<!-- Apollo -->
+<rect x="230" y="20" width="190" height="180" rx="8" fill="#faeeda" stroke="#ba7517" stroke-width="1"/>
+<text x="325" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#633806" font-family="Georgia,serif">Apollo</text>
+<text x="325" y="62" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Contact enrichment</text>
+<text x="250" y="84" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Find contacts by company</text>
+<text x="250" y="100" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Email + phone data</text>
+<text x="250" y="116" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Push to HubSpot</text>
+<text x="250" y="140" font-size="11" fill="#a32d2d" font-family="Georgia,serif" font-weight="500">⚠ Currently broken</text>
+<text x="250" y="156" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Admin switch broke the</text>
+<text x="250" y="172" font-size="11" fill="#a32d2d" font-family="Georgia,serif">push connection. Contacts</text>
+<text x="250" y="188" font-size="11" fill="#a32d2d" font-family="Georgia,serif">entered manually for now.</text>
+
+<!-- PandaDoc -->
+<rect x="440" y="20" width="220" height="180" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="1"/>
+<text x="550" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">PandaDoc</text>
+<text x="550" y="62" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Contracts + agreements</text>
+<text x="460" y="84" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Electronic signature</text>
+<text x="460" y="100" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Formal agreements sent here</text>
+<text x="460" y="116" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· 5 years of contracts stored</text>
+<text x="460" y="140" font-size="11" fill="#a32d2d" font-family="Georgia,serif" font-weight="500">⚠ Not integrated w/ HubSpot</text>
+<text x="460" y="156" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Signed contracts not visible</text>
+<text x="460" y="172" font-size="11" fill="#a32d2d" font-family="Georgia,serif">in HubSpot. Built manually</text>
+<text x="460" y="188" font-size="11" fill="#a32d2d" font-family="Georgia,serif">by rep since EA left.</text>
+
+<!-- Fireflies -->
+<rect x="20" y="220" width="190" height="140" rx="8" fill="#eeedfe" stroke="#534ab7" stroke-width="1"/>
+<text x="115" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#3c3489" font-family="Georgia,serif">Fireflies AI</text>
+<text x="115" y="262" text-anchor="middle" font-size="11" fill="#534ab7" font-family="Georgia,serif">Meeting recording</text>
+<text x="40" y="284" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Auto-joins Teams meetings</text>
+<text x="40" y="300" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Transcripts uploaded</text>
+<text x="40" y="316" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Rep reviews + rates calls</text>
+<text x="40" y="332" font-size="11" fill="#a32d2d" font-family="Georgia,serif">· Doesn't always auto-join</text>
+<text x="40" y="348" font-size="11" fill="#a32d2d" font-family="Georgia,serif">· Sometimes needs manual invite</text>
+
+<!-- Outlook -->
+<rect x="230" y="220" width="190" height="140" rx="8" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/>
+<text x="325" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#0c447c" font-family="Georgia,serif">Outlook</text>
+<text x="325" y="262" text-anchor="middle" font-size="11" fill="#185fa5" font-family="Georgia,serif">Email + calendar</text>
+<text x="250" y="284" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Synced to HubSpot</text>
+<text x="250" y="300" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Emails logged on contact</text>
+<text x="250" y="316" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Calendar meetings visible</text>
+<text x="250" y="332" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Replies from Outlook synced</text>
+
+<!-- HubSpot calls -->
+<rect x="440" y="220" width="220" height="140" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="1"/>
+<text x="550" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">HubSpot Calls</text>
+<text x="550" y="262" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Outbound calling</text>
+<text x="460" y="284" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Dial directly from HubSpot</text>
+<text x="460" y="300" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Logged automatically</text>
+<text x="460" y="316" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Tracks dial count per rep</text>
+<text x="460" y="332" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Recorded calls reviewable</text>
+<text x="460" y="348" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· AI rating of call quality</text>
+
+</svg>
+</div>
+
+<!-- ── GAPS TODAY ── -->
+<div id="sales-gaps" class="sales-panel" style="display:none;">
+<svg viewBox="0 0 680 500" style="display:block;width:100%;height:auto;">
+
+<!-- Header -->
+<rect x="20" y="20" width="640" height="28" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="340" y="38" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">Active gaps in the sales process — confirmed from discovery sessions</text>
+
+<!-- Gap 1 -->
+<rect x="20" y="64" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="84" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">No deal distribution rule</text>
+<text x="40" y="102" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Inbound leads are assigned case</text>
+<text x="40" y="118" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">by case with no formal criteria.</text>
+<text x="40" y="134" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Not sustainable as the team grows.</text>
+<text x="40" y="146" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Define with Sales leadership</text>
+
+<!-- Gap 2 -->
+<rect x="360" y="64" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="84" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Apollo push broken</text>
+<text x="380" y="102" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Admin switch broke the Apollo →</text>
+<text x="380" y="118" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">HubSpot connection. Contacts</text>
+<text x="380" y="134" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">entered manually today.</text>
+<text x="380" y="146" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Bryan to fix Apollo admin connection</text>
+
+<!-- Gap 3 -->
+<rect x="20" y="170" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="190" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">PandaDoc not integrated</text>
+<text x="40" y="208" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">5 years of signed contracts live</text>
+<text x="40" y="224" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">only in PandaDoc. Not visible</text>
+<text x="40" y="240" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">in HubSpot at deal level.</text>
+<text x="40" y="252" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Build HubSpot ↔ PandaDoc integration</text>
+
+<!-- Gap 4 -->
+<rect x="360" y="170" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="190" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Company naming inconsistent</text>
+<text x="380" y="208" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Reps use site names, concept</text>
+<text x="380" y="224" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">names, or legal names depending</text>
+<text x="380" y="240" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">on what they know. Hierarchy lost.</text>
+<text x="380" y="252" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Two-name system + Closed Won validation</text>
+
+<!-- Gap 5 -->
+<rect x="20" y="276" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="296" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Closed Ghosted deleted</text>
+<text x="40" y="314" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">No way to separate prospects</text>
+<text x="40" y="330" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">who said no from those who</text>
+<text x="40" y="346" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">went silent. Prime re-engagement</text>
+<text x="40" y="358" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Recreate as Prospecting Status value</text>
+
+<!-- Gap 6 -->
+<rect x="360" y="276" width="300" height="90" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="296" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">No structured daily workspace</text>
+<text x="380" y="314" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Reps work from memory and</text>
+<text x="380" y="330" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">intuition. No prioritized queue,</text>
+<text x="380" y="346" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">no ICP scoring visible in HubSpot.</text>
+<text x="380" y="358" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ 4 saved views + ICP score (Phase 01)</text>
+
+<!-- Gap 7: Fireflies -->
+<rect x="20" y="382" width="300" height="76" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="402" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Fireflies doesn't always join</text>
+<text x="40" y="420" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Rep must manually invite Fireflies</text>
+<text x="40" y="436" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">to some meetings. Some calls</text>
+<text x="40" y="452" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Configure Fireflies auto-join rules</text>
+
+<!-- Gap 8: MRR vs ARR -->
+<rect x="360" y="382" width="300" height="76" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="402" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">MRR vs ARR confusion</text>
+<text x="380" y="420" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">4 deals above $300K likely</text>
+<text x="380" y="436" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">entered as ARR — inflating pipeline</text>
+<text x="380" y="452" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ MRR per store ≤ $500 validation rule</text>
+
+</svg>
+</div>
+
+<script>
+function showSales(id, btn) {
+  document.querySelectorAll('.sales-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('#sales-nav .tab-btn').forEach(b => b.classList.remove('s-active'));
+  document.getElementById('sales-' + id).style.display = 'block';
+  btn.classList.add('s-active');
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CRM / CS TEAM SECTION
+════════════════════════════════════════════════════════════════ -->
+<hr style="margin: 48px 0 40px; border: none; border-top: 1px solid #eceae3;">
+
+<div style="margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #eceae3;">
+  <h2 style="font-size: 22px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 4px; font-family: Georgia, serif;">CRM / CS team — how it works today</h2>
+  <p style="font-size: 14px; color: #5f5e5a; font-style: italic; font-family: Georgia, serif;">Consolidated from discovery sessions with the CS team · May 2026</p>
+</div>
+
+<div class="tab-nav" id="crm-nav">
+  <button class="tab-btn crm-active" onclick="showCrm('handoff',this)">Sales → CS handoff</button>
+  <button class="tab-btn" onclick="showCrm('account',this)">Account management</button>
+  <button class="tab-btn" onclick="showCrm('tools',this)">Tools & systems</button>
+  <button class="tab-btn" onclick="showCrm('gaps',this)">Gaps today</button>
+</div>
+
+<style>
+.tab-btn.crm-active { color: #1a1a18; border-bottom-color: #1a1a18; }
+</style>
+
+<!-- ── HANDOFF ── -->
+<div id="crm-handoff" class="crm-panel" style="display:block;">
+<svg viewBox="0 0 680 540" style="display:block;width:100%;height:auto;">
+<defs>
+  <marker id="carr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- Column headers -->
+<rect x="20"  y="10" width="180" height="18" rx="3" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="110" y="22" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Sales team</text>
+<rect x="250" y="10" width="200" height="18" rx="3" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="350" y="22" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">CS / CRM team</text>
+<rect x="490" y="10" width="170" height="18" rx="3" fill="#f1efe8" stroke="#b4b2a9" stroke-width="0.5"/>
+<text x="575" y="22" text-anchor="middle" font-family="Georgia,serif" font-size="11" fill="#5f5e5a">HubSpot</text>
+
+<!-- Step 1: deal closes -->
+<rect x="20" y="38" width="180" height="56" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="110" y="56" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Deal reaches Closed Won</text>
+<text x="110" y="72" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Contract signed via PandaDoc</text>
+<text x="110" y="86" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Sales owns deal</text>
+
+<!-- Step 2: sales updates company -->
+<line x1="110" y1="94" x2="110" y2="122" stroke="#5f5e5a" stroke-width="1" marker-end="url(#carr)"/>
+<rect x="20" y="122" width="180" height="68" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="110" y="140" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" font-family="Georgia,serif">Sales updates Company</text>
+<text x="110" y="156" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Name → legal name from contract</text>
+<text x="110" y="170" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Assigns site name field</text>
+<text x="110" y="184" text-anchor="middle" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Lifecycle → Client</text>
+
+<!-- Arrow to HubSpot -->
+<line x1="200" y1="156" x2="488" y2="156" stroke="#5f5e5a" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#carr)"/>
+<text x="340" y="148" text-anchor="middle" font-size="10" fill="#8a8880" font-family="Georgia,serif">updated in HubSpot</text>
+<rect x="490" y="130" width="170" height="56" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="575" y="150" text-anchor="middle" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Company record updated</text>
+<text x="575" y="166" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Legal name · site name</text>
+<text x="575" y="180" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Lifecycle = Client</text>
+
+<!-- Ownership transfer -->
+<line x1="110" y1="190" x2="110" y2="218" stroke="#5f5e5a" stroke-width="1" marker-end="url(#carr)"/>
+<rect x="20" y="218" width="180" height="44" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="110" y="236" text-anchor="middle" font-size="13" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Ownership transferred</text>
+<text x="110" y="252" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Company owner → CS account manager</text>
+
+<line x1="200" y1="240" x2="248" y2="240" stroke="#5f5e5a" stroke-width="1" marker-end="url(#carr)"/>
+
+<!-- CS receives -->
+<rect x="250" y="218" width="200" height="44" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+<text x="350" y="236" text-anchor="middle" font-size="13" font-weight="500" fill="#27500a" font-family="Georgia,serif">CS team takes ownership</text>
+<text x="350" y="252" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Account manager assigned to client</text>
+
+<!-- Rule: same AM for enterprise -->
+<rect x="250" y="278" width="200" height="56" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+<text x="350" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#27500a" font-family="Georgia,serif">One AM per enterprise</text>
+<text x="350" y="312" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Same account manager owns all</text>
+<text x="350" y="326" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">companies under one holding group</text>
+
+<!-- Sales still owns deal -->
+<rect x="20" y="278" width="180" height="56" rx="6" fill="#e6f1fb" stroke="#185fa5" stroke-width="0.5"/>
+<text x="110" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#0c447c" font-family="Georgia,serif">Sales retains deal ownership</text>
+<text x="110" y="312" text-anchor="middle" font-size="11" fill="#185fa5" font-family="Georgia,serif">Even for existing clients with</text>
+<text x="110" y="326" text-anchor="middle" font-size="11" fill="#185fa5" font-family="Georgia,serif">new expansion deals</text>
+
+<!-- Note: coexistence is fine -->
+<rect x="20" y="354" width="640" height="56" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+<text x="340" y="374" text-anchor="middle" font-size="13" font-weight="500" fill="#27500a" font-family="Georgia,serif">Sales and CS activity on the same Company record is expected</text>
+<text x="340" y="392" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">When Sales opens an expansion deal for an existing client, their communication is on the same Company. CS and Sales timelines coexist — this is by design.</text>
+
+<!-- Contract renewal — new urgent note -->
+<rect x="20" y="430" width="640" height="76" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="340" y="450" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">URGENT — contract renewals: no tracking infrastructure exists</text>
+<text x="340" y="468" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">The first contract with a term limit (1-year and 3-year options) was sent May 28, 2026. All previous contracts were evergreen — no expiration tracking was ever needed.</text>
+<text x="340" y="484" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">No system, no reminder, no automation exists today. Proposed fix: Contract as a custom HubSpot object with end date + automated renewal reminders.</text>
+
+</svg>
+</div>
+
+<!-- ── ACCOUNT MANAGEMENT ── -->
+<div id="crm-account" class="crm-panel" style="display:none;">
+<svg viewBox="0 0 680 500" style="display:block;width:100%;height:auto;">
+<defs>
+  <marker id="aarr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- How CS uses HubSpot -->
+<rect x="20" y="20" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="31" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">HOW CS TEAM USES HUBSPOT TODAY</text>
+
+<rect x="20" y="46" width="190" height="80" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="115" y="64" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Client view</text>
+<text x="40" y="82" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Filter: Lifecycle = Client</text>
+<text x="40" y="98" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Filter: Has site name field</text>
+<text x="40" y="114" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Ignores leads / vendors</text>
+
+<rect x="230" y="46" width="190" height="80" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="325" y="64" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Account visibility</text>
+<text x="250" y="82" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Company record = client history</text>
+<text x="250" y="98" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Emails · meetings · tasks</text>
+<text x="250" y="114" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Open support tickets (Zendesk)</text>
+
+<rect x="440" y="46" width="220" height="80" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="550" y="64" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" font-family="Georgia,serif">Contracts access</text>
+<text x="460" y="82" font-size="11" fill="#0f6e56" font-family="Georgia,serif">All CRMs have access to</text>
+<text x="460" y="98" font-size="11" fill="#0f6e56" font-family="Georgia,serif">SharePoint sales folder</text>
+<text x="460" y="114" font-size="11" fill="#0f6e56" font-family="Georgia,serif">Check contracts when needed</text>
+
+<!-- New location process -->
+<rect x="20" y="146" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="157" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">WHEN A CLIENT ADDS A NEW LOCATION (existing concept)</text>
+
+<rect x="20" y="172" width="150" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="95" y="190" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Client fills form</text>
+<text x="95" y="206" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">New location request</text>
+<text x="95" y="220" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">via Rosnet portal</text>
+
+<line x1="170" y1="200" x2="188" y2="200" stroke="#5f5e5a" stroke-width="1" marker-end="url(#aarr)"/>
+
+<rect x="190" y="172" width="150" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="265" y="190" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">CS opens location</text>
+<text x="265" y="206" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">No sales process</text>
+<text x="265" y="220" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">No deal created</text>
+
+<line x1="340" y1="200" x2="358" y2="200" stroke="#5f5e5a" stroke-width="1" marker-end="url(#aarr)"/>
+
+<rect x="360" y="172" width="150" height="56" rx="6" fill="#faeeda" stroke="#ba7517" stroke-width="0.5"/>
+<text x="435" y="190" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" font-family="Georgia,serif">Finance notified</text>
+<text x="435" y="206" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Alert triggers billing</text>
+<text x="435" y="220" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">update in Maxio</text>
+
+<!-- New concept process -->
+<rect x="20" y="248" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="259" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">WHEN A CLIENT ADDS A NEW CONCEPT</text>
+
+<rect x="20" y="274" width="180" height="56" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+<text x="110" y="292" text-anchor="middle" font-size="12" font-weight="500" fill="#27500a" font-family="Georgia,serif">Sales opens expansion deal</text>
+<text x="110" y="308" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">New deal on existing Company</text>
+<text x="110" y="324" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Sales owns the deal</text>
+
+<line x1="200" y1="302" x2="218" y2="302" stroke="#5f5e5a" stroke-width="1" marker-end="url(#aarr)"/>
+
+<rect x="220" y="274" width="200" height="56" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+<text x="320" y="292" text-anchor="middle" font-size="12" font-weight="500" fill="#27500a" font-family="Georgia,serif">Same CS account manager</text>
+<text x="320" y="308" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">One AM per enterprise</text>
+<text x="320" y="324" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">regardless of # of concepts</text>
+
+<line x1="420" y1="302" x2="438" y2="302" stroke="#5f5e5a" stroke-width="1" marker-end="url(#aarr)"/>
+
+<rect x="440" y="274" width="220" height="56" rx="6" fill="#eaf3de" stroke="#3b6d11" stroke-width="0.5"/>
+<text x="550" y="292" text-anchor="middle" font-size="12" font-weight="500" fill="#27500a" font-family="Georgia,serif">New site added post-close</text>
+<text x="550" y="308" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">Finance sets up new subscription</text>
+<text x="550" y="324" text-anchor="middle" font-size="11" fill="#3b6d11" font-family="Georgia,serif">in Maxio after implementation</text>
+
+<!-- Churn note -->
+<rect x="20" y="350" width="640" height="16" rx="3" fill="#eceae3"/>
+<text x="340" y="361" text-anchor="middle" font-size="10" fill="#5f5e5a" font-family="Georgia,serif">WHEN A CLIENT LEAVES (CHURN)</text>
+
+<rect x="20" y="376" width="300" height="80" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="170" y="396" text-anchor="middle" font-size="12" font-weight="500" fill="#791f1f" font-family="Georgia,serif">CS notifies leadership</text>
+<text x="40" y="414" font-size="11" fill="#a32d2d" font-family="Georgia,serif">CS tracks churn by location count</text>
+<text x="40" y="430" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Finance tracks churn by revenue</text>
+<text x="40" y="446" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Two different numbers — no single source</text>
+
+<rect x="360" y="376" width="300" height="80" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="510" y="396" text-anchor="middle" font-size="12" font-weight="500" fill="#791f1f" font-family="Georgia,serif">Lifecycle updated manually</text>
+<text x="380" y="414" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Company → Former Client</text>
+<text x="380" y="430" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Finance updates Maxio billing</text>
+<text x="380" y="446" font-size="11" fill="#a32d2d" font-family="Georgia,serif">No automated trigger or alert</text>
+
+</svg>
+</div>
+
+<!-- ── TOOLS ── -->
+<div id="crm-tools" class="crm-panel" style="display:none;">
+<svg viewBox="0 0 680 460" style="display:block;width:100%;height:auto;">
+
+<!-- HubSpot -->
+<rect x="20" y="20" width="190" height="180" rx="8" fill="#e1f5ee" stroke="#0f6e56" stroke-width="1"/>
+<text x="115" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#085041" font-family="Georgia,serif">HubSpot</text>
+<text x="115" y="62" text-anchor="middle" font-size="11" fill="#085041" font-family="Georgia,serif">Primary CS tool (since ~1yr)</text>
+<text x="40" y="84" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Client company records</text>
+<text x="40" y="100" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Activity timeline (emails, meetings)</text>
+<text x="40" y="116" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Lifecycle stage tracking</text>
+<text x="40" y="132" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Zendesk ticket integration</text>
+<text x="40" y="148" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Enterprise / parent hierarchy</text>
+<text x="40" y="164" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Fireflies meeting transcripts</text>
+<text x="40" y="180" font-size="11" fill="#0f6e56" font-family="Georgia,serif">· Task management</text>
+
+<!-- Zendesk -->
+<rect x="230" y="20" width="190" height="180" rx="8" fill="#faeeda" stroke="#ba7517" stroke-width="1"/>
+<text x="325" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#633806" font-family="Georgia,serif">Zendesk</text>
+<text x="325" y="62" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Support tickets</text>
+<text x="250" y="84" font-size="11" fill="#ba7517" font-family="Georgia,serif">· All support tickets live here</text>
+<text x="250" y="100" font-size="11" fill="#ba7517" font-family="Georgia,serif">· CS team works in Zendesk</text>
+<text x="250" y="116" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Syncs to HubSpot (one-way)</text>
+<text x="250" y="140" font-size="11" fill="#a32d2d" font-family="Georgia,serif" font-weight="500">⚠ Sync is incomplete</text>
+<text x="250" y="156" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Only closed + pending tickets</text>
+<text x="250" y="172" font-size="11" fill="#a32d2d" font-family="Georgia,serif">push to HubSpot. Not reliable</text>
+<text x="250" y="188" font-size="11" fill="#a32d2d" font-family="Georgia,serif">enough to use as source of truth.</text>
+
+<!-- PandaDoc / SharePoint -->
+<rect x="440" y="20" width="220" height="180" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="1"/>
+<text x="550" y="44" text-anchor="middle" font-size="14" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">PandaDoc + SharePoint</text>
+<text x="550" y="62" text-anchor="middle" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Contracts + SOWs</text>
+<text x="460" y="84" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· All contracts stored in PandaDoc</text>
+<text x="460" y="100" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· Also backed up in SharePoint</text>
+<text x="460" y="116" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· SOWs sent for existing clients</text>
+<text x="460" y="132" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">· CS team can access all contracts</text>
+<text x="460" y="156" font-size="11" fill="#a32d2d" font-family="Georgia,serif" font-weight="500">⚠ Not integrated with HubSpot</text>
+<text x="460" y="172" font-size="11" fill="#a32d2d" font-family="Georgia,serif">Contracts not visible in</text>
+<text x="460" y="188" font-size="11" fill="#a32d2d" font-family="Georgia,serif">HubSpot Company record.</text>
+
+<!-- Fireflies -->
+<rect x="20" y="220" width="190" height="120" rx="8" fill="#eeedfe" stroke="#534ab7" stroke-width="1"/>
+<text x="115" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#3c3489" font-family="Georgia,serif">Fireflies AI</text>
+<text x="115" y="262" text-anchor="middle" font-size="11" fill="#534ab7" font-family="Georgia,serif">Meeting recording (3 weeks)</text>
+<text x="40" y="284" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Auto-joins client meetings</text>
+<text x="40" y="300" font-size="11" fill="#534ab7" font-family="Georgia,serif">· Transcripts stored in Fireflies</text>
+<text x="40" y="316" font-size="11" fill="#a32d2d" font-family="Georgia,serif">· Integration never audited</text>
+<text x="40" y="332" font-size="11" fill="#a32d2d" font-family="Georgia,serif">· Status in HubSpot unknown</text>
+
+<!-- Intranet -->
+<rect x="230" y="220" width="190" height="120" rx="8" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/>
+<text x="325" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#0c447c" font-family="Georgia,serif">Intranet (Power Center)</text>
+<text x="325" y="262" text-anchor="middle" font-size="11" fill="#185fa5" font-family="Georgia,serif">Product + operations</text>
+<text x="250" y="284" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Active locations per site</text>
+<text x="250" y="300" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Products per client</text>
+<text x="250" y="316" font-size="11" fill="#185fa5" font-family="Georgia,serif">· Site name (identifier)</text>
+<text x="250" y="332" font-size="11" fill="#a32d2d" font-family="Georgia,serif">· Not synced to HubSpot</text>
+
+<!-- Billing file -->
+<rect x="440" y="220" width="220" height="120" rx="8" fill="#faeeda" stroke="#ba7517" stroke-width="1"/>
+<text x="550" y="244" text-anchor="middle" font-size="14" font-weight="500" fill="#633806" font-family="Georgia,serif">Billing audit file</text>
+<text x="550" y="262" text-anchor="middle" font-size="11" fill="#854f0b" font-family="Georgia,serif">Excel → SQL via VPN</text>
+<text x="460" y="284" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Every active restaurant</text>
+<text x="460" y="300" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Site name + billing entity</text>
+<text x="460" y="316" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Cross-system decoder ring</text>
+<text x="460" y="332" font-size="11" fill="#ba7517" font-family="Georgia,serif">· Used by CS and Finance</text>
+
+<!-- Note: no CS pipeline -->
+<rect x="20" y="360" width="640" height="60" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="340" y="382" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">No CS pipeline in HubSpot today</text>
+<text x="340" y="400" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">Implementation is tracked in Trello + spreadsheets. No milestone tracking, no dependency automation, no visibility for Sales or leadership.</text>
+<text x="340" y="414" text-anchor="middle" font-size="11" fill="#791f1f" font-family="Georgia,serif">Proposed: CS pipeline in HubSpot with implementation stages — planned for Q3 2026.</text>
+
+</svg>
+</div>
+
+<!-- ── GAPS ── -->
+<div id="crm-gaps" class="crm-panel" style="display:none;">
+<svg viewBox="0 0 680 480" style="display:block;width:100%;height:auto;">
+
+<rect x="20" y="20" width="640" height="28" rx="6" fill="#fcebeb" stroke="#a32d2d" stroke-width="0.5"/>
+<text x="340" y="38" text-anchor="middle" font-size="13" font-weight="500" fill="#a32d2d" font-family="Georgia,serif">Active gaps in the CS / CRM process — confirmed from discovery sessions</text>
+
+<!-- Gap 1 -->
+<rect x="20" y="64" width="300" height="88" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="84" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Email sync breaks on Outlook restart</text>
+<text x="40" y="102" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Outlook sync turns off automatically</text>
+<text x="40" y="118" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">when the computer restarts. 300+</text>
+<text x="40" y="134" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">emails missing for one client since Feb.</text>
+<text x="40" y="144" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Fix Outlook sync settings (BlueFrog)</text>
+
+<!-- Gap 2 -->
+<rect x="360" y="64" width="300" height="88" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="84" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Location count always stale</text>
+<text x="380" y="102" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">No integration between Intranet and</text>
+<text x="380" y="118" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">HubSpot. Location count and products</text>
+<text x="380" y="134" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">are always out of date in HubSpot.</text>
+<text x="380" y="144" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Intranet → HubSpot Site sync</text>
+
+<!-- Gap 3 -->
+<rect x="20" y="168" width="300" height="88" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="188" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">No contract renewal tracking</text>
+<text x="40" y="206" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">First term-limit contract sent May 28.</text>
+<text x="40" y="222" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">No system, no reminder, no automation.</text>
+<text x="40" y="238" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">All past contracts were evergreen.</text>
+<text x="40" y="248" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Contract custom object + automated reminders</text>
+
+<!-- Gap 4 -->
+<rect x="360" y="168" width="300" height="88" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="188" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">SOWs not tracked anywhere</text>
+<text x="380" y="206" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Statements of Work (professional</text>
+<text x="380" y="222" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">services) generate revenue but don't</text>
+<text x="380" y="238" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">appear in any HubSpot pipeline.</text>
+<text x="380" y="248" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Separate pipeline or custom deal type</text>
+
+<!-- Gap 5 -->
+<rect x="20" y="272" width="300" height="88" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="292" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">HubSpot auto-creates companies</text>
+<text x="40" y="310" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Every inbound email creates a new</text>
+<text x="40" y="326" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Company record — including vendors</text>
+<text x="40" y="342" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">and irrelevant contacts. Inflates count.</text>
+<text x="40" y="352" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Disable automation or add Vendor lifecycle</text>
+
+<!-- Gap 6 -->
+<rect x="360" y="272" width="300" height="88" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="292" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Implementation not in HubSpot</text>
+<text x="380" y="310" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Trello + spreadsheets only. No visibility</text>
+<text x="380" y="326" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">for Sales or leadership. No milestone</text>
+<text x="380" y="342" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">automation or dependency tracking.</text>
+<text x="380" y="352" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ CS pipeline in HubSpot (Q3 2026)</text>
+
+<!-- Gap 7 -->
+<rect x="20" y="376" width="300" height="76" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="40" y="396" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Zendesk sync is incomplete</text>
+<text x="40" y="414" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Only closed + pending tickets push to</text>
+<text x="40" y="430" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">HubSpot. CS uses Zendesk dashboards</text>
+<text x="40" y="443" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Fix Zendesk ↔ HubSpot two-way sync</text>
+
+<!-- Gap 8 -->
+<rect x="360" y="376" width="300" height="76" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="380" y="396" font-size="12" font-weight="500" fill="#2c2c2a" font-family="Georgia,serif">Churn definition conflict</text>
+<text x="380" y="414" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">CS tracks churn by locations.</text>
+<text x="380" y="430" font-size="11" fill="#5f5e5a" font-family="Georgia,serif">Finance tracks churn by revenue.</text>
+<text x="380" y="443" font-size="10" fill="#a32d2d" font-family="Georgia,serif" font-style="italic">→ Align definition with Finance team</text>
+
+</svg>
+</div>
+
+<script>
+function showCrm(id, btn) {
+  document.querySelectorAll('.crm-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('#crm-nav .tab-btn').forEach(b => b.classList.remove('crm-active'));
+  document.getElementById('crm-' + id).style.display = 'block';
+  btn.classList.add('crm-active');
+}
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HIERARCHY SECTION
+════════════════════════════════════════════════════════════════ -->
+<hr style="margin: 48px 0 40px; border: none; border-top: 1px solid #eceae3;">
+
+<div style="margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #eceae3;">
+  <h2 style="font-size: 22px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 4px; font-family: Georgia, serif;">Account hierarchy</h2>
+  <p style="font-size: 14px; color: #5f5e5a; font-style: italic; font-family: Georgia, serif;">Click each level to see what it means, where it lives, and the rules that apply</p>
+</div>
+
+<style>
+.hier-level { display:flex; align-items:stretch; gap:0; margin-bottom:6px; cursor:pointer; border-radius:8px; overflow:hidden; border:1px solid #d3d1c7; transition: box-shadow 0.15s; }
+.hier-level:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.hier-level.active { box-shadow: 0 0 0 2px #2c2c2a; }
+.hier-badge { width:48px; min-width:48px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:500; font-family:Georgia,serif; }
+.hier-main { flex:1; padding:12px 16px; background:#fafaf8; }
+.hier-title { font-size:15px; font-weight:500; font-family:Georgia,serif; color:#1a1a18; margin:0 0 2px; }
+.hier-sub { font-size:12px; color:#5f5e5a; font-family:Georgia,serif; margin:0; }
+.hier-rule { min-width:160px; padding:12px 14px; display:flex; align-items:center; font-size:12px; font-family:Georgia,serif; }
+.hier-detail { display:none; margin-bottom:16px; border-radius:8px; overflow:hidden; border:1px solid #d3d1c7; }
+.hier-detail.open { display:grid; grid-template-columns:1fr 1fr 1fr; }
+.hier-col { padding:16px 18px; }
+.hier-col-title { font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; margin:0 0 10px; }
+.hier-col-item { font-size:13px; font-family:Georgia,serif; color:#1a1a18; margin:4px 0; line-height:1.5; }
+.hier-col-item.muted { color:#5f5e5a; }
+.hier-example { margin-top:16px; padding:14px 18px; background:#f5f4f0; border-radius:8px; }
+.hier-example-title { font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; color:#5f5e5a; margin:0 0 12px; font-family:Georgia,serif; }
+.hier-case { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+.hier-case-card { background:#fff; border:1px solid #d3d1c7; border-radius:6px; padding:10px 12px; }
+.hier-case-label { font-size:11px; font-weight:500; color:#5f5e5a; margin:0 0 6px; font-family:Georgia,serif; }
+.hier-case-text { font-size:12px; color:#1a1a18; font-family:Georgia,serif; line-height:1.5; margin:0; }
+</style>
+
+<div id="hier-container">
+
+  <!-- Level 1: Holding Group -->
+  <div class="hier-level" onclick="toggleHier('h1')" style="border-color:#b4b2a9;">
+    <div class="hier-badge" style="background:#f1efe8;color:#444441;">1</div>
+    <div class="hier-main">
+      <p class="hier-title">Holding Group</p>
+      <p class="hier-sub">The parent entity that owns multiple operators — e.g. Flynn Restaurant Group, Ashoori Group, Hamra Enterprises</p>
+    </div>
+    <div class="hier-rule" style="background:#f1efe8;color:#5f5e5a;">Optional — not all clients have one</div>
+  </div>
+  <div id="h1" class="hier-detail">
+    <div class="hier-col" style="background:#f5f4f0;">
+      <p class="hier-col-title" style="color:#444441;">In HubSpot</p>
+      <p class="hier-col-item">Parent Company record</p>
+      <p class="hier-col-item muted">Relationship only — no deals, no billing, no activities associated here</p>
+      <p class="hier-col-item muted">Today: only 39 enterprises configured for 5,541 companies</p>
+    </div>
+    <div class="hier-col" style="background:#eceae3;">
+      <p class="hier-col-title" style="color:#444441;">In Maxio</p>
+      <p class="hier-col-item">Customer (operator level)</p>
+      <p class="hier-col-item muted">Parent relationship exists in Maxio for consolidated billing groups</p>
+      <p class="hier-col-item muted">e.g. Sizzling Platter — 16 concepts, one billing destination</p>
+    </div>
+    <div class="hier-col" style="background:#f5f4f0;">
+      <p class="hier-col-title" style="color:#444441;">In Intranet</p>
+      <p class="hier-col-item muted">Not a direct entity — hierarchy is at site level</p>
+    </div>
+  </div>
+
+  <!-- Level 2: Operating Company -->
+  <div class="hier-level" onclick="toggleHier('h2')" style="border-color:#0f6e56;">
+    <div class="hier-badge" style="background:#e1f5ee;color:#085041;">2</div>
+    <div class="hier-main" style="background:#f0faf6;">
+      <p class="hier-title" style="color:#085041;">Operating Company ★ CORE</p>
+      <p class="hier-sub">The legal entity that signs the contract with ROSnet — e.g. Midwest Food Management LLC, Win America LLC</p>
+    </div>
+    <div class="hier-rule" style="background:#e1f5ee;color:#085041;font-weight:500;">Required — center of everything</div>
+  </div>
+  <div id="h2" class="hier-detail">
+    <div class="hier-col" style="background:#e1f5ee;">
+      <p class="hier-col-title" style="color:#085041;">In HubSpot</p>
+      <p class="hier-col-item" style="color:#085041;">Company record — CORE OBJECT</p>
+      <p class="hier-col-item" style="color:#0f6e56;">All deals, contacts, and activities live here</p>
+      <p class="hier-col-item" style="color:#0f6e56;">Name = legal entity from contract (validated at Closed Won)</p>
+      <p class="hier-col-item" style="color:#0f6e56;">Site name field = searchable internal code (e.g. NGE FUZZIES)</p>
+    </div>
+    <div class="hier-col" style="background:#c8eede;">
+      <p class="hier-col-title" style="color:#085041;">In Maxio</p>
+      <p class="hier-col-item" style="color:#085041;">Customer record</p>
+      <p class="hier-col-item" style="color:#0f6e56;">One customer per billing entity (consolidated or split)</p>
+      <p class="hier-col-item" style="color:#0f6e56;">Legal name from contract</p>
+    </div>
+    <div class="hier-col" style="background:#e1f5ee;">
+      <p class="hier-col-title" style="color:#085041;">In Intranet</p>
+      <p class="hier-col-item" style="color:#085041;">Legal Operator</p>
+      <p class="hier-col-item" style="color:#0f6e56;">Mirrors the Operating Company</p>
+      <p class="hier-col-item" style="color:#0f6e56;">Contains all sites for that operator</p>
+    </div>
+  </div>
+
+  <!-- Level 3: Billing Sub-Entity -->
+  <div class="hier-level" onclick="toggleHier('h3')" style="border-color:#ba7517;">
+    <div class="hier-badge" style="background:#faeeda;color:#633806;">3</div>
+    <div class="hier-main" style="background:#fdf6ec;">
+      <p class="hier-title">Billing Sub-Entity</p>
+      <p class="hier-sub">Groups subscriptions when a client wants billing split by region or bank account — e.g. Hamra Chicago LLC, Wendy's of Missouri Inc.</p>
+    </div>
+    <div class="hier-rule" style="background:#faeeda;color:#854f0b;">Optional — varies by billing structure</div>
+  </div>
+  <div id="h3" class="hier-detail">
+    <div class="hier-col" style="background:#faeeda;">
+      <p class="hier-col-title" style="color:#633806;">In HubSpot</p>
+      <p class="hier-col-item" style="color:#854f0b;">TBD with data team</p>
+      <p class="hier-col-item muted">May become a custom object. Currently causes duplicate Company records — the 8 Ashoori duplicates are sub-entities being confused with companies.</p>
+    </div>
+    <div class="hier-col" style="background:#f5e4cc;">
+      <p class="hier-col-title" style="color:#633806;">In Maxio</p>
+      <p class="hier-col-item" style="color:#854f0b;">Billing Sub-Entity</p>
+      <p class="hier-col-item muted">Separate customer record per billing destination. Each has its own invoice address and payment method.</p>
+      <p class="hier-col-item muted">e.g. Hamra has 4 billing entities under one enterprise.</p>
+    </div>
+    <div class="hier-col" style="background:#faeeda;">
+      <p class="hier-col-title" style="color:#633806;">In Intranet</p>
+      <p class="hier-col-item muted">Not a direct entity — represented via billing override name field in billing audit file</p>
+    </div>
+  </div>
+
+  <!-- Level 4: Site -->
+  <div class="hier-level" onclick="toggleHier('h4')" style="border-color:#534ab7;">
+    <div class="hier-badge" style="background:#eeedfe;color:#3c3489;">4</div>
+    <div class="hier-main" style="background:#f5f4fe;">
+      <p class="hier-title" style="color:#3c3489;">Site — the universal bridge key</p>
+      <p class="hier-sub">One ROSnet product instance per operator × concept. Identified by rosnet_site_id (e.g. AHG, DOHERTY, IHOPHC). The only stable identifier that exists across all three systems.</p>
+    </div>
+    <div class="hier-rule" style="background:#eeedfe;color:#534ab7;font-weight:500;">Required per operator × concept</div>
+  </div>
+  <div id="h4" class="hier-detail">
+    <div class="hier-col" style="background:#eeedfe;">
+      <p class="hier-col-title" style="color:#3c3489;">In HubSpot</p>
+      <p class="hier-col-item" style="color:#3c3489;">Custom Object (proposed)</p>
+      <p class="hier-col-item" style="color:#534ab7;">Associated to Company via rosnet_site_id</p>
+      <p class="hier-col-item" style="color:#534ab7;">Receives synced data: location count + products from Intranet, MRR from Maxio</p>
+      <p class="hier-col-item muted">Decision pending: Option A (aggregate fields on Company) vs Option B (Site custom object)</p>
+    </div>
+    <div class="hier-col" style="background:#d8d6f8;">
+      <p class="hier-col-title" style="color:#3c3489;">In Maxio</p>
+      <p class="hier-col-item" style="color:#3c3489;">Subscription</p>
+      <p class="hier-col-item" style="color:#534ab7;">One subscription per site</p>
+      <p class="hier-col-item" style="color:#534ab7;">MRR lives here · components = active products</p>
+      <p class="hier-col-item muted">⚠ site_id currently only at subscription level — needs to move to customer level</p>
+    </div>
+    <div class="hier-col" style="background:#eeedfe;">
+      <p class="hier-col-title" style="color:#3c3489;">In Intranet</p>
+      <p class="hier-col-item" style="color:#3c3489;">Site — primary entity</p>
+      <p class="hier-col-item" style="color:#534ab7;">Most accurate source for location count and active products</p>
+      <p class="hier-col-item" style="color:#534ab7;">Updated when locations open or close</p>
+    </div>
+  </div>
+
+  <!-- Level 5: Location -->
+  <div class="hier-level" onclick="toggleHier('h5')" style="border-color:#b4b2a9;">
+    <div class="hier-badge" style="background:#f1efe8;color:#444441;">5</div>
+    <div class="hier-main">
+      <p class="hier-title">Location / Restaurant</p>
+      <p class="hier-sub">Individual store. The atomic unit. e.g. Hotcakes 0806. Drives the billing multiplier in Maxio.</p>
+    </div>
+    <div class="hier-rule" style="background:#f1efe8;color:#5f5e5a;">Count only — not a record</div>
+  </div>
+  <div id="h5" class="hier-detail">
+    <div class="hier-col" style="background:#f5f4f0;">
+      <p class="hier-col-title" style="color:#444441;">In HubSpot</p>
+      <p class="hier-col-item">Location count field on Site object</p>
+      <p class="hier-col-item muted">Not an individual record. Integer field. Source of truth: Intranet.</p>
+      <p class="hier-col-item muted">Today: always stale — no sync. Must be updated manually.</p>
+    </div>
+    <div class="hier-col" style="background:#eceae3;">
+      <p class="hier-col-title" style="color:#444441;">In Maxio</p>
+      <p class="hier-col-item">Subscription quantity (billing multiplier)</p>
+      <p class="hier-col-item muted">Each module updated separately per location change. Manual today — target: automated via Maxio API.</p>
+    </div>
+    <div class="hier-col" style="background:#f5f4f0;">
+      <p class="hier-col-title" style="color:#444441;">In Intranet</p>
+      <p class="hier-col-item">Most accurate location count</p>
+      <p class="hier-col-item muted">Updated when stores open or close via alert system. Source of truth for active locations.</p>
+    </div>
+  </div>
+
+  <!-- Concept note -->
+  <div style="margin-top:8px;padding:12px 16px;background:#f5f4f0;border-radius:8px;border:1px solid #d3d1c7;display:flex;align-items:center;gap:14px;">
+    <span style="font-size:22px;font-weight:500;font-family:Georgia,serif;color:#8a8880;min-width:48px;text-align:center;">—</span>
+    <div>
+      <p style="font-size:15px;font-weight:500;font-family:Georgia,serif;color:#5f5e5a;margin:0 0 2px;">Concept / Brand — not a hierarchy level</p>
+      <p style="font-size:12px;color:#8a8880;font-family:Georgia,serif;margin:0;">Wendy's, IHOP, Applebee's are brand labels — a field on the Site object, not a separate record or hierarchy level. One operator can have multiple concepts. Each concept gets its own Site and Deal, not its own Company.</p>
+    </div>
+  </div>
+
+  <!-- Real examples -->
+  <div class="hier-example" style="margin-top:16px;">
+    <p class="hier-example-title">Three real configurations — same model, different permutations</p>
+    <div class="hier-case">
+      <div class="hier-case-card">
+        <p class="hier-case-label">Simple operator</p>
+        <p class="hier-case-text">No holding group · 1 operator · 1 concept · 1 site<br><br>e.g. Lenz Enterprises LLC operating Cheba Hut — 7 locations. One Company, one Deal, one Site.</p>
+      </div>
+      <div class="hier-case-card">
+        <p class="hier-case-label">Multi-concept operator</p>
+        <p class="hier-case-text">Holding group → 1 operator · 2 concepts · 2 sites<br><br>e.g. Good Times Restaurants, Inc. operating Good Time Burgers (27 locs) + Bad Daddy's (37 locs). One Company, two Deals, two Sites.</p>
+      </div>
+      <div class="hier-case-card">
+        <p class="hier-case-label">Complex group</p>
+        <p class="hier-case-text">Enterprise → multiple legal entities · multiple concepts · multiple billing sub-entities<br><br>e.g. Hamra Enterprises → Hamra Chicago LLC + Wendy's of Missouri Inc. + Wendy's of New England LLC. Three Companies, N Sites, 4 billing sub-entities.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleHier(id) {
+  const el = document.getElementById(id);
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.hier-detail').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.hier-level').forEach(l => l.classList.remove('active'));
+  if (!isOpen) {
+    el.classList.add('open');
+    el.previousElementSibling.classList.add('active');
+  }
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     DECISIONS NEEDED SECTION
+════════════════════════════════════════════════════════════════ -->
+<hr style="margin: 48px 0 40px; border: none; border-top: 1px solid #eceae3;">
+
+<div style="margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid #eceae3;">
+  <h2 style="font-size: 22px; font-weight: 500; letter-spacing: -0.3px; margin-bottom: 4px; font-family: Georgia, serif;">Decisions needed</h2>
+  <p style="font-size: 14px; color: #5f5e5a; font-style: italic; font-family: Georgia, serif;">These must be resolved before configuration can begin. Sorted by urgency.</p>
+</div>
+
+<style>
+.dec-group-title {
+  font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em;
+  color: #8a8880; font-family: Georgia, serif; margin: 24px 0 10px;
+}
+.dec-group-title:first-child { margin-top: 0; }
+.dec-card {
+  display: flex; gap: 0; border-radius: 8px; overflow: hidden;
+  border: 1px solid #d3d1c7; margin-bottom: 8px;
+}
+.dec-severity {
+  width: 6px; min-width: 6px; flex-shrink: 0;
+}
+.dec-body { padding: 14px 16px; flex: 1; background: #fafaf8; }
+.dec-title { font-size: 14px; font-weight: 500; font-family: Georgia, serif; color: #1a1a18; margin: 0 0 6px; }
+.dec-context { font-size: 13px; font-family: Georgia, serif; color: #5f5e5a; margin: 0; line-height: 1.6; }
+.dec-context strong { color: #2c2c2a; font-weight: 500; }
+</style>
+
+<p class="dec-group-title">Critical — blocking architecture and integration</p>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#a32d2d;"></div>
+  <div class="dec-body">
+    <p class="dec-title">Integration architecture: Option A or Option B?</p>
+    <p class="dec-context"><strong>Option A:</strong> Aggregate fields directly on the Company record (MRR, location count, products). Fast to implement, no new objects. Fragile — sync relies on name matching, breaks with any rename. Technical debt.<br><strong>Option B:</strong> Site as a custom HubSpot object, associated via rosnet_site_id. Correct architecture. Data flows cleanly at site level. More complex — requires whiteboard session with Jack + Josh verification. Recommended. <strong>Everything else depends on this decision.</strong></p>
+  </div>
+</div>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#a32d2d;"></div>
+  <div class="dec-body">
+    <p class="dec-title">Fix site_id in Maxio — move from subscription to customer level</p>
+    <p class="dec-context">The rosnet_site_id currently only exists at the subscription level in Maxio — not at the customer/billing entity level. This means you cannot search for a billing entity by site name. Any HubSpot ↔ Maxio sync will fail without this fix. <strong>Must be resolved with the Finance and tech team before any integration work begins.</strong></p>
+  </div>
+</div>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#a32d2d;"></div>
+  <div class="dec-body">
+    <p class="dec-title">Contract renewal tracking — what is the infrastructure?</p>
+    <p class="dec-context">The first contract with a term limit (1-year and 3-year options) was sent on May 28, 2026. All previous contracts were evergreen — no renewal tracking was ever needed. No system, reminder, or automation exists today. <strong>Proposed: Contract as a custom HubSpot object with end date field and automated reminders. Who owns the design and configuration of this?</strong></p>
+  </div>
+</div>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#a32d2d;"></div>
+  <div class="dec-body">
+    <p class="dec-title">Companies owned by departed employee — reassign or not?</p>
+    <p class="dec-context">A former team member owns 876 Company records in HubSpot. 0 are active clients. 493 have no lifecycle stage. She has been on indefinite leave for 4 months with no official status update. <strong>This is a legal situation — cannot reassign without explicit approval from leadership. A decision is needed before cleanup can proceed.</strong></p>
+  </div>
+</div>
+
+<p class="dec-group-title">High — blocking cleanup and configuration</p>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#ba7517;"></div>
+  <div class="dec-body">
+    <p class="dec-title">New concept for same legal entity: New Business or Expansion?</p>
+    <p class="dec-context">When a current client adds a new concept (e.g. Sun Holdings already has Bar Louie on ROSnet and now wants to add Popeyes), what deal type should Sales use? The taxonomy is ambiguous today — some reps mark it as New Business, others as Expansion. <strong>This affects pipeline reporting, commission calculation, and how the deal type field is configured in HubSpot.</strong></p>
+  </div>
+</div>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#ba7517;"></div>
+  <div class="dec-body">
+    <p class="dec-title">HubSpot auto-creates a Company from every inbound email — disable?</p>
+    <p class="dec-context">An active HubSpot automation creates a new Company record for every inbound email — including vendors, payroll companies, and irrelevant contacts. This is inflating the company count daily and polluting the CRM. <strong>Options: disable the automation entirely, or create a "Vendor / Other" lifecycle stage to filter these out from client views.</strong></p>
+  </div>
+</div>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#ba7517;"></div>
+  <div class="dec-body">
+    <p class="dec-title">Statements of Work — where are they tracked?</p>
+    <p class="dec-context">The CS team sends SOWs (professional services) to existing clients. This is real revenue that does not appear in any deal or pipeline in HubSpot today — completely invisible to leadership. <strong>Should SOWs live in a separate CS pipeline, as a custom deal type, or as a custom object? Needs a decision before the CS pipeline is designed.</strong></p>
+  </div>
+</div>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#ba7517;"></div>
+  <div class="dec-body">
+    <p class="dec-title">Should billing sub-entities become a HubSpot object?</p>
+    <p class="dec-context">Billing sub-entities currently live in Maxio only. Some clients (like Hamra with 4 billing entities) have complex billing structures. Today, sub-entities are being confused with Companies — creating duplicate records. <strong>Should they become a custom object in HubSpot, or remain Maxio-only and be represented via fields on the Site object? Requires data team input.</strong></p>
+  </div>
+</div>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#ba7517;"></div>
+  <div class="dec-body">
+    <p class="dec-title">Deal distribution rule between sales reps</p>
+    <p class="dec-context">When an inbound lead comes through the website form, there is no formal rule for which rep takes it. The decision is made case by case. <strong>As the team grows, this is unsustainable. A distribution rule is needed — by geography, by segment, by concept type, or by rotation.</strong></p>
+  </div>
+</div>
+
+<p class="dec-group-title">Medium — needed for naming and data cleanup</p>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#5f5e5a;"></div>
+  <div class="dec-body">
+    <p class="dec-title">ICP Score criteria — what defines High, Medium, Low?</p>
+    <p class="dec-context">The ICP Score (High / Medium / Low) needs to be defined before it can be configured in HubSpot. Possible criteria: location count, concept type (QSR vs casual dining), ownership model, geography, or a weighted combination. <strong>Currently scored via Apollo export but invisible in HubSpot — needs validation with Sales leadership.</strong></p>
+  </div>
+</div>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#5f5e5a;"></div>
+  <div class="dec-body">
+    <p class="dec-title">Naming conventions — Company, Site, Contact</p>
+    <p class="dec-context">Deal naming is confirmed: [Operator] — [Concept]. All other naming conventions are still TBD: Company (legal name vs DBA), Site ([site_id] — [descriptive name]), Contact (First Last (Role)). <strong>These must be agreed before deduplication begins — you cannot deduplicate with inconsistent names.</strong></p>
+  </div>
+</div>
+
+<div class="dec-card">
+  <div class="dec-severity" style="background:#5f5e5a;"></div>
+  <div class="dec-body">
+    <p class="dec-title">Does the site name go in the deal name or as a separate field?</p>
+    <p class="dec-context">Sales reps search by site name (e.g. AZCHEBA, DOHERTY) — not by legal operator name. The confirmed deal name convention is [Operator] — [Concept]. <strong>Should the site name also appear in the deal name, or only as a separate searchable field? Both must be accessible to reps. Tom: "I know what we refer to them as in Rosnet."</strong></p>
+  </div>
+</div>
+
+
+
+<!-- EXPORT BAR -->
+<div class="export-bar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <p><strong>ROSnet CRM review</strong> — <span id="comment-counter">0 comments</span></p>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <input class="name-input" placeholder="Your name..." oninput="setReviewerName(this.value)" title="Enter your name — it will appear on all comments">
+    <button class="export-btn" onclick="exportComments()">⬇ Export comments</button>
+  </div>
+</div>
+
+<script>
+// ── COMMENT SYSTEM ──
+const REVIEWER_NAME_KEY = 'rosnet_reviewer_name';
+
+function getReviewerName() {
+  return localStorage.getItem(REVIEWER_NAME_KEY) || '';
+}
+
+function setReviewerName(name) {
+  localStorage.setItem(REVIEWER_NAME_KEY, name);
+  document.querySelectorAll('.name-input').forEach(i => i.value = name);
+}
+
+function getComments(zoneId) {
+  try { return JSON.parse(localStorage.getItem('comments_' + zoneId) || '[]'); } catch { return []; }
+}
+
+function saveComment(zoneId, text) {
+  const name = getReviewerName() || 'Reviewer';
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + ' · ' + now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+  const comments = getComments(zoneId);
+  comments.push({ name, date: dateStr, text });
+  localStorage.setItem('comments_' + zoneId, JSON.stringify(comments));
+  renderComments(zoneId);
+  updateExportBar();
+}
+
+function deleteComment(zoneId, idx) {
+  const comments = getComments(zoneId);
+  comments.splice(idx, 1);
+  localStorage.setItem('comments_' + zoneId, JSON.stringify(comments));
+  renderComments(zoneId);
+  updateExportBar();
+}
+
+function renderComments(zoneId) {
+  const list = document.getElementById('clist_' + zoneId);
+  if (!list) return;
+  const comments = getComments(zoneId);
+  if (comments.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = comments.map((c, i) => `
+    <div class="comment-item">
+      <p class="comment-meta">${c.name} · ${c.date} <span onclick="deleteComment('${zoneId}',${i})" style="float:right;cursor:pointer;opacity:0.4;font-size:11px;">✕ remove</span></p>
+      <p class="comment-text">${c.text.replace(/\n/g,'<br>')}</p>
+    </div>`).join('');
+}
+
+function submitComment(zoneId) {
+  const ta = document.getElementById('cta_' + zoneId);
+  const text = ta.value.trim();
+  if (!text) return;
+  saveComment(zoneId, text);
+  ta.value = '';
+}
+
+function updateExportBar() {
+  let total = 0;
+  document.querySelectorAll('[id^="clist_"]').forEach(el => {
+    const zoneId = el.id.replace('clist_','');
+    total += getComments(zoneId).length;
+  });
+  const counter = document.getElementById('comment-counter');
+  if (counter) counter.textContent = total + ' comment' + (total !== 1 ? 's' : '');
+}
+
+function exportComments() {
+  const name = getReviewerName() || 'Reviewer';
+  const date = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+  let out = `ROSnet CRM — Review comments\nReviewer: ${name}\nExported: ${date}\n${'='.repeat(60)}\n\n`;
+  let total = 0;
+  document.querySelectorAll('[id^="clist_"]').forEach(el => {
+    const zoneId = el.id.replace('clist_','');
+    const comments = getComments(zoneId);
+    if (comments.length === 0) return;
+    const label = document.getElementById('clabel_' + zoneId);
+    out += `\n── ${label ? label.textContent : zoneId} ──\n`;
+    comments.forEach((c, i) => {
+      out += `\n[${i+1}] ${c.name} · ${c.date}\n${c.text}\n`;
+      total++;
+    });
+  });
+  if (total === 0) { alert('No comments yet.'); return; }
+  out += `\n${'='.repeat(60)}\nTotal: ${total} comment${total !== 1 ? 's' : ''}`;
+  const blob = new Blob([out], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'rosnet_review_comments.txt';
+  a.click();
+}
+
+function buildCommentZone(zoneId, label) {
+  return `
+  <div class="comment-zone">
+    <p class="comment-zone-title" id="clabel_${zoneId}">${label}</p>
+    <div class="comment-list" id="clist_${zoneId}"></div>
+    <div class="comment-input-row">
+      <textarea class="comment-input" id="cta_${zoneId}" placeholder="Add a comment on this section..." rows="2" onkeydown="if(event.key==='Enter'&&event.ctrlKey){submitComment('${zoneId}')}"></textarea>
+      <button class="comment-btn" onclick="submitComment('${zoneId}')">Add</button>
+    </div>
+  </div>`;
+}
+
+// init on load
+window.addEventListener('DOMContentLoaded', () => {
+  // inject comment zones after each major section
+  const zones = [
+    { id:'billing_new_client',    label:'Finance — New client setup' },
+    { id:'billing_first',         label:'Finance — First billing' },
+    { id:'billing_loc_open',      label:'Finance — Location opens' },
+    { id:'billing_loc_close',     label:'Finance — Location closes' },
+    { id:'billing_monthly',       label:'Finance — Monthly cycle' },
+    { id:'sales_pipeline',        label:'Sales — Pipeline stages' },
+    { id:'sales_daily',           label:'Sales — Daily workflow' },
+    { id:'sales_tools',           label:'Sales — Tools & systems' },
+    { id:'sales_gaps',            label:'Sales — Gaps today' },
+    { id:'crm_handoff',           label:'CS/CRM — Sales to CS handoff' },
+    { id:'crm_account',           label:'CS/CRM — Account management' },
+    { id:'crm_tools',             label:'CS/CRM — Tools & systems' },
+    { id:'crm_gaps',              label:'CS/CRM — Gaps today' },
+    { id:'hier_h1',               label:'Hierarchy — Holding Group' },
+    { id:'hier_h2',               label:'Hierarchy — Operating Company' },
+    { id:'hier_h3',               label:'Hierarchy — Billing Sub-Entity' },
+    { id:'hier_h4',               label:'Hierarchy — Site' },
+    { id:'hier_h5',               label:'Hierarchy — Location' },
+    { id:'dec_critical',          label:'Decisions — Critical' },
+    { id:'dec_high',              label:'Decisions — High priority' },
+    { id:'dec_medium',            label:'Decisions — Medium priority' },
+  ];
+
+  // inject into tab panels and detail sections
+  const panelMap = {
+    'billing_new_client': 'tab-new-client',
+    'billing_first':      'tab-first-billing',
+    'billing_loc_open':   'tab-loc-open',
+    'billing_loc_close':  'tab-loc-close',
+    'billing_monthly':    'tab-monthly',
+    'sales_pipeline':     'sales-pipeline',
+    'sales_daily':        'sales-daily',
+    'sales_tools':        'sales-tools',
+    'sales_gaps':         'sales-gaps',
+    'crm_handoff':        'crm-handoff',
+    'crm_account':        'crm-account',
+    'crm_tools':          'crm-tools',
+    'crm_gaps':           'crm-gaps',
+  };
+
+  zones.forEach(z => {
+    const panelId = panelMap[z.id];
+    if (panelId) {
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        const div = document.createElement('div');
+        div.innerHTML = buildCommentZone(z.id, z.label);
+        panel.appendChild(div.firstElementChild);
+        renderComments(z.id);
+      }
+    }
+  });
+
+  // hierarchy detail panels
+  const hierMap = { 'hier_h1':'h1','hier_h2':'h2','hier_h3':'h3','hier_h4':'h4','hier_h5':'h5' };
+  Object.entries(hierMap).forEach(([zId, hId]) => {
+    const panel = document.getElementById(hId);
+    if (panel) {
+      const zone = zones.find(z => z.id === zId);
+      const div = document.createElement('div');
+      div.innerHTML = buildCommentZone(zId, zone.label);
+      panel.appendChild(div.firstElementChild);
+      renderComments(zId);
+    }
+  });
+
+  // decisions — inject after each group
+  const decGroups = [
+    { id:'dec_critical', selector:'.dec-group-title:nth-of-type(1)' },
+  ];
+
+  // simpler: inject one comment zone after each dec-group-title
+  const decTitles = document.querySelectorAll('.dec-group-title');
+  const decIds = ['dec_critical','dec_high','dec_medium'];
+  const decLabels = ['Decisions — Critical blockers','Decisions — High priority','Decisions — Medium priority'];
+
+  decTitles.forEach((title, i) => {
+    if (!decIds[i]) return;
+    // collect all cards until next title
+    const container = document.createElement('div');
+    container.innerHTML = buildCommentZone(decIds[i], decLabels[i]);
+    // insert after last dec-card in this group
+    let node = title.nextElementSibling;
+    let lastCard = null;
+    while (node && !node.classList.contains('dec-group-title')) {
+      if (node.classList && node.classList.contains('dec-card')) lastCard = node;
+      node = node.nextElementSibling;
+    }
+    if (lastCard) lastCard.after(container.firstElementChild);
+    renderComments(decIds[i]);
+  });
+
+  // restore reviewer name
+  const savedName = getReviewerName();
+  document.querySelectorAll('.name-input').forEach(i => i.value = savedName);
+
+  updateExportBar();
+});
+</script>
+</body>
+</html>
