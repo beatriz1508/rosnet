@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Billing Process</title>
+<title>Discovery Overview</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -163,6 +163,29 @@ body { padding-bottom: 64px; }
 .decision-grid { display:grid; grid-template-columns:1fr; gap:8px; margin-top:18px; }
 .decision-title { font-size:18px; font-weight:500; margin:28px 0 12px; font-family:Georgia,serif;}
 @media (max-width:800px){ .area-intro{grid-template-columns:1fr;} body{padding:20px;} }
+</style>
+
+<style>
+/* COMMENT SYSTEM */
+.czone { margin-top: 20px; border-top: 1px solid #eceae3; padding-top: 16px; }
+.czone-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: #8a8880; margin: 0 0 10px; font-family: Georgia, serif; }
+.clist { margin-bottom: 10px; }
+.citem { background: #fffbf0; border: 1px solid #faeeda; border-radius: 6px; padding: 10px 12px; margin-bottom: 6px; }
+.cmeta { font-size: 11px; color: #854f0b; margin: 0 0 4px; font-weight: 500; }
+.ctext { font-size: 13px; color: #1a1a18; margin: 0; line-height: 1.5; }
+.crow { display: flex; gap: 8px; align-items: flex-start; }
+.cinput { flex: 1; padding: 8px 10px; font-size: 13px; font-family: Georgia, serif; border: 1px solid #d3d1c7; border-radius: 6px; background: #fafaf8; color: #1a1a18; resize: vertical; min-height: 36px; }
+.cinput:focus { outline: none; border-color: #5f5e5a; }
+.cbtn { padding: 8px 14px; font-size: 12px; font-family: Georgia, serif; font-weight: 500; background: #1a1a18; color: #fff; border: none; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+.cbtn:hover { background: #444441; }
+.ebar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a18; color: #fff; padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; font-family: Georgia, serif; z-index: 1000; }
+.ebar p { margin: 0; font-size: 13px; color: #b4b2a9; }
+.ebar strong { color: #fff; }
+.ebtn { padding: 8px 20px; font-size: 13px; font-family: Georgia, serif; font-weight: 500; background: #faeeda; color: #633806; border: none; border-radius: 6px; cursor: pointer; }
+.ebtn:hover { background: #fac775; }
+.ninput { padding: 6px 10px; font-size: 13px; font-family: Georgia, serif; border: none; border-radius: 6px; background: #2c2c2a; color: #fff; width: 180px; }
+.ninput::placeholder { color: #5f5e5a; }
+body { padding-bottom: 80px; }
 </style>
 </head>
 <body>
@@ -1552,5 +1575,117 @@ function showArea(id, btn) {
 }
 </script>
 
+
+<!-- EXPORT BAR -->
+<div class="ebar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <p><strong>ROSnet CRM review</strong> — <span id="ecounter">0 comments</span></p>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <input class="ninput" placeholder="Your name..." oninput="setRName(this.value)" title="Your name appears on all comments">
+    <button class="ebtn" onclick="exportAll()">⬇ Export comments</button>
+  </div>
+</div>
+
+<script>
+const NK = 'rosnet_rname';
+function getRName() { return localStorage.getItem(NK) || ''; }
+function setRName(n) { localStorage.setItem(NK, n); document.querySelectorAll('.ninput').forEach(i => i.value = n); }
+function getC(id) { try { return JSON.parse(localStorage.getItem('c_' + id) || '[]'); } catch { return []; } }
+function saveC(id, text) {
+  const name = getRName() || 'Reviewer';
+  const d = new Date();
+  const ds = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' · ' + d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  const cs = getC(id); cs.push({name, date:ds, text});
+  localStorage.setItem('c_' + id, JSON.stringify(cs));
+  renderC(id); updateBar();
+}
+function delC(id, i) { const cs = getC(id); cs.splice(i,1); localStorage.setItem('c_' + id, JSON.stringify(cs)); renderC(id); updateBar(); }
+function renderC(id) {
+  const list = document.getElementById('cl_' + id); if (!list) return;
+  const cs = getC(id);
+  list.innerHTML = cs.length === 0 ? '' : cs.map((c,i) => '<div class="citem"><p class="cmeta">' + c.name + ' · ' + c.date + '<span onclick="delC(\'' + id + '\',' + i + ')" style="float:right;cursor:pointer;opacity:0.4;font-size:11px;">✕</span></p><p class="ctext">' + c.text.replace(/\n/g,'<br>') + '</p></div>').join('');
+}
+function submitC(id) { const ta = document.getElementById('ct_' + id); const t = ta.value.trim(); if (!t) return; saveC(id, t); ta.value = ''; }
+function updateBar() {
+  let n = 0; document.querySelectorAll('[id^="cl_"]').forEach(el => n += getC(el.id.replace('cl_','')).length);
+  const ec = document.getElementById('ecounter'); if (ec) ec.textContent = n + ' comment' + (n!==1?'s':'');
+}
+function exportAll() {
+  const name = getRName() || 'Reviewer';
+  const date = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  let out = 'ROSnet CRM Review comments\nReviewer: ' + name + '\nExported: ' + date + '\n' + '='.repeat(60) + '\n\n';
+  let total = 0;
+  document.querySelectorAll('[id^="cl_"]').forEach(el => {
+    const id = el.id.replace('cl_',''); const cs = getC(id); if (!cs.length) return;
+    const lbl = document.getElementById('clabel_' + id);
+    out += '\n── ' + (lbl ? lbl.textContent : id) + ' ──\n';
+    cs.forEach((c,i) => { out += '\n[' + (i+1) + '] ' + c.name + ' · ' + c.date + '\n' + c.text + '\n'; total++; });
+  });
+  if (!total) { alert('No comments yet.'); return; }
+  out += '\n' + '='.repeat(60) + '\nTotal: ' + total + ' comment' + (total!==1?'s':'');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([out],{type:'text/plain'}));
+  a.download = 'rosnet_review_comments.txt'; a.click();
+}
+function buildCZ(id, label) {
+  return '<div class="czone"><p class="czone-title" id="clabel_' + id + '">' + label + '</p><div class="clist" id="cl_' + id + '"></div><div class="crow"><textarea class="cinput" id="ct_' + id + '" placeholder="Add a comment..." rows="2" onkeydown="if(event.key===\'Enter\'&&event.ctrlKey)submitC(\'' + id + '\')"></textarea><button class="cbtn" onclick="submitC(\'' + id + '\')">Add</button></div></div>';
+}
+
+// Panel IDs → comment zone labels
+const ZONES = {
+  'sales-pipeline':  'Sales — Pipeline stages',
+  'sales-daily':     'Sales — Daily workflow',
+  'sales-tools':     'Sales — Tools & systems',
+  'sales-gaps':      'Sales — Gaps today',
+  'tab-new-client':  'Finance — New client setup',
+  'tab-first-billing':'Finance — First billing',
+  'tab-loc-open':    'Finance — Location opens',
+  'tab-loc-close':   'Finance — Location closes',
+  'tab-monthly':     'Finance — Monthly cycle',
+  'crm-handoff':     'CS/CRM — Sales to CS handoff',
+  'crm-account':     'CS/CRM — Account management',
+  'crm-tools':       'CS/CRM — Tools & systems',
+  'crm-gaps':        'CS/CRM — Gaps today',
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  Object.entries(ZONES).forEach(([panelId, label]) => {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    const id = panelId.replace(/-/g,'_');
+    const div = document.createElement('div');
+    div.innerHTML = buildCZ(id, label);
+    panel.appendChild(div.firstElementChild);
+    renderC(id);
+  });
+
+  // Add comment zones after each decision-grid too
+  const dGrids = document.querySelectorAll('.decision-grid');
+  const dLabels = ['Sales — Decisions', 'Finance — Decisions', 'CRM — Decisions'];
+  dGrids.forEach((grid, i) => {
+    const id = 'dec_' + i;
+    const div = document.createElement('div');
+    div.innerHTML = buildCZ(id, dLabels[i] || 'Decisions');
+    grid.after(div.firstElementChild);
+    renderC(id);
+  });
+
+  // Hierarchy panels
+  ['h1','h2','h3','h4','h5'].forEach(hid => {
+    const panel = document.getElementById(hid);
+    if (!panel) return;
+    const id = 'hier_' + hid;
+    const div = document.createElement('div');
+    div.innerHTML = buildCZ(id, 'Hierarchy — level ' + hid.replace('h',''));
+    panel.appendChild(div.firstElementChild);
+    renderC(id);
+  });
+
+  const saved = getRName();
+  document.querySelectorAll('.ninput').forEach(i => i.value = saved);
+  updateBar();
+});
+</script>
 </body>
 </html>
